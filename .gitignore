@@ -1,0 +1,6 @@
+/demo/.idea
+/demo/*.sln
+/demo/Library/
+/demo/*.csproj
+/demo/Temp
+/demo/Logs
