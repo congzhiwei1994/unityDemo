@@ -56,14 +56,42 @@ public class SceneController : MonoBehaviour
         yield return null;
 
         var asyncOption = SceneManager.LoadSceneAsync(currentIndex, LoadSceneMode.Single);
+        asyncOption.allowSceneActivation = false;
 
-        while (!asyncOption.isDone)
+        float cur = 0.00f;
+        while (true)
         {
-            onPeogessChage?.Invoke(asyncOption.progress);
-            Debug.LogError(asyncOption.progress);
+            if (asyncOption.progress < 0.90f)
+            {
+                //没加载完之前的进度条速度
+                cur += 0.2f * Time.deltaTime;
+                cur = Mathf.Min(cur, 0.90f);
+            }
+            else
+            {
+                //加载完之后的进度条速度
+                cur += 0.4f * Time.deltaTime;
+                cur = Mathf.Min(cur, 1.00f);
+            }
+
+            onPeogessChage?.Invoke(cur);
+            Debug.LogError("Real Progress: " + asyncOption.progress + " : Fake Progress: " + cur);
+
+            if (cur >= 1.0f)
+            {
+                asyncOption.allowSceneActivation = true;
+                break;
+            }
+            yield return null;
         }
 
-        yield return new WaitForSeconds(1);
+        //等待真的100%
+        yield return new WaitUntil(() =>
+        {
+            return asyncOption.isDone;
+        });
+
+        Debug.LogError("Load Done: " + currentIndex);
         onFinsh?.Invoke();
     }
 }
