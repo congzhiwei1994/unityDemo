@@ -26,9 +26,7 @@ namespace czw.GostShadow
 
             _renderers = GetComponentsInChildren<SkinnedMeshRenderer>();
             if (_renderers == null)
-            {
                 _renderers = new SkinnedMeshRenderer[0];
-            }
         }
 
         /// <summary>
@@ -45,6 +43,7 @@ namespace czw.GostShadow
             else
             {
                 item = SpwanNew();
+                InitGostShadow(item);
             }
 
             item.SetActive(true);
@@ -52,12 +51,21 @@ namespace czw.GostShadow
             _activeList.Add(item);
         }
 
-        private void InitShadow(GostShadow item)
+        /// <summary>
+        /// 初始化 GostShadow，执行GostShadow。Init()。
+        /// </summary>
+        /// <param name="item"></param>
+        private void InitGostShadow(GostShadow item)
         {
             for (int i = 0; i < _renderers.Length; i++)
             {
-                item.Init(i, _renderers[i].material, null);
+                item.Init(i, _renderers[i].material, GetShader(), Despwan);
             }
+        }
+
+        private Shader GetShader()
+        {
+            return Shader.Find(GostShadowConstData.SHADER_NAME);
         }
 
         /// <summary>
@@ -69,7 +77,7 @@ namespace czw.GostShadow
             _inactiveList.Add(item);
             item.SetActive(false);
         }
-
+  
         /// <summary>
         /// 更新状态
         /// </summary>
@@ -79,6 +87,8 @@ namespace czw.GostShadow
             {
                 Mesh mesh = new Mesh();
                 _renderers[i].BakeMesh(mesh);
+                var t = _renderers[i].transform;
+                item.UpadeMesh(i, mesh, t.position, t.rotation);
             }
         }
 
