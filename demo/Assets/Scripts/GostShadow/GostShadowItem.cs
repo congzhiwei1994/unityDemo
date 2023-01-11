@@ -18,12 +18,14 @@ namespace czw.GostShadow
                 filter = this.gameObject.AddComponent<MeshFilter>();
             if (renderer == null)
                 renderer = this.gameObject.AddComponent<MeshRenderer>();
-            if (shader != null)
-                material.shader = shader;
             if (fadeEffect == null)
                 fadeEffect = this.gameObject.AddComponent<FadeEffect>();
-
+            
             renderer.material = material;
+             
+            if (shader != null)
+                renderer.material.shader = shader;
+            
             onComplete = complete;
         }
 

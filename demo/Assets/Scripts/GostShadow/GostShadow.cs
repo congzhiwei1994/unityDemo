@@ -18,7 +18,7 @@ namespace czw.GostShadow
             var item = go.AddComponent<GostShadowItem>();
             go.transform.SetParent(this.transform);
             itemDic.Add(id, item);
-
+            
             item.Init(material, shader, () => complate(this));
         }
 
@@ -29,7 +29,7 @@ namespace czw.GostShadow
 
         public void UpadeMesh(int id, Mesh mesh, Vector3 pos, Quaternion rot)
         {
-            if (itemDic.ContainsKey(id))
+            if (!itemDic.ContainsKey(id))
             {
                 Debug.LogError("当前ID不存在,id" + id);
                 return;

@@ -6,6 +6,12 @@ using UnityEngine;
 
 namespace czw.GostShadow
 {
+    public enum SpwanState
+    {
+        ENABLE,
+        DISABLE
+    }
+
     /// <summary>
     /// 内存池用来管理多个Item
     /// </summary>
@@ -16,17 +22,44 @@ namespace czw.GostShadow
 
         //非活跃
         private List<GostShadow> _inactiveList;
-
         private SkinnedMeshRenderer[] _renderers;
 
-        private void Start()
+        private SpwanState spwanState;
+
+        // 上一次时间
+        private float lastTime;
+
+        public void Init()
         {
+            spwanState = SpwanState.DISABLE;
             _activeList = new List<GostShadow>();
             _inactiveList = new List<GostShadow>();
 
             _renderers = GetComponentsInChildren<SkinnedMeshRenderer>();
             if (_renderers == null)
                 _renderers = new SkinnedMeshRenderer[0];
+        }
+
+        /// <summary>
+        /// 外部调用，动态修改状态
+        /// </summary>
+        public void SetSpwanState(SpwanState state)
+        {
+            spwanState = state;
+        }
+
+        private bool JudgeState()
+        {
+            return spwanState == SpwanState.ENABLE;
+        }
+
+        private void Update()
+        {
+            if (JudgeState() && Time.time - lastTime > GostShadowConstData.SPAWN_INTERVAL_TIME)
+            {
+                lastTime = Time.time;
+                Spwan();
+            }
         }
 
         /// <summary>
@@ -38,7 +71,7 @@ namespace czw.GostShadow
             if (_inactiveList.Count > 0)
             {
                 item = _inactiveList[0];
-                _inactiveList.Remove(_inactiveList[0]);
+                _inactiveList.Remove(item);
             }
             else
             {
@@ -77,7 +110,7 @@ namespace czw.GostShadow
             _inactiveList.Add(item);
             item.SetActive(false);
         }
-  
+
         /// <summary>
         /// 更新状态
         /// </summary>
@@ -87,8 +120,7 @@ namespace czw.GostShadow
             {
                 Mesh mesh = new Mesh();
                 _renderers[i].BakeMesh(mesh);
-                var t = _renderers[i].transform;
-                item.UpadeMesh(i, mesh, t.position, t.rotation);
+                item.UpadeMesh(i, mesh, _renderers[i].transform.position, _renderers[i].transform.rotation);
             }
         }
 
@@ -97,7 +129,7 @@ namespace czw.GostShadow
         /// </summary>
         private GostShadow SpwanNew()
         {
-            GameObject go = new GameObject();
+            GameObject go = new GameObject("SpwanNew");
             return go.AddComponent<GostShadow>();
         }
     }
