@@ -4,3 +4,4 @@
 /demo/*.csproj
 /demo/Temp
 /demo/Logs
+/demo/obj
