@@ -85,6 +85,16 @@ namespace czw.GostShadow
         }
 
         /// <summary>
+        /// 回收
+        /// </summary>
+        public void Despwan(GostShadow item)
+        {
+            _activeList.Remove(item);
+            _inactiveList.Add(item);
+            item.SetActive(false);
+        }
+
+        /// <summary>
         /// 初始化 GostShadow，执行GostShadow。Init()。
         /// </summary>
         /// <param name="item"></param>
@@ -101,15 +111,6 @@ namespace czw.GostShadow
             return Shader.Find(GostShadowConstData.SHADER_NAME);
         }
 
-        /// <summary>
-        /// 回收
-        /// </summary>
-        public void Despwan(GostShadow item)
-        {
-            _activeList.Remove(item);
-            _inactiveList.Add(item);
-            item.SetActive(false);
-        }
 
         /// <summary>
         /// 更新状态

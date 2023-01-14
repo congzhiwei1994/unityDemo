@@ -22,7 +22,6 @@ namespace czw.GostShadow
                 fadeEffect = this.gameObject.AddComponent<FadeEffect>();
             
             renderer.material = material;
-             
             if (shader != null)
                 renderer.material.shader = shader;
             
