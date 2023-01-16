@@ -40,10 +40,10 @@ Shader "czw/Character/Skin/SSSS(Seperable SubSurface Scattering)"
 
         Pass
         {
-            Name "Forward"
+            Name "SkinSSS_Diffuse"
             Tags
             {
-                "LightMode"="UniversalForwardOnly"
+                "LightMode" = "SkinSSSS"
             }
 
             HLSLPROGRAM
@@ -61,11 +61,50 @@ Shader "czw/Character/Skin/SSSS(Seperable SubSurface Scattering)"
             #pragma multi_compile_instancing
 
             #pragma vertex LitPassVertex
-            #pragma fragment LitPassFragment
+            #pragma fragment LitPassFragment_Diffuse
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
             #include"Assets/Art/Character/Shader/Includes/SSSS/SSSSInput.hlsl"
             #include"Assets/Art/Character/Shader/Includes/SSSS/SSSSDiffuse.hlsl"
-            
+            ENDHLSL
+        }
+
+        Pass
+        {
+            Name "SkinSpcular+SkinSSS"
+            Tags
+            {
+                "LightMode" = "UniversalForward"
+            }
+
+            HLSLPROGRAM
+            #pragma target 4.5
+
+            // Universal Pipeline keywords
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+
+            #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+
+            #pragma vertex LitPassVertex
+            #pragma fragment LitPassFragment_Specular
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+
+            #include"Assets/Art/Character/Shader/Includes/SSSS/SSSSInput.hlsl"
+            #include"Assets/Art/Character/Shader/Includes/SSSS/SSSSDiffuse.hlsl"
             ENDHLSL
         }
 

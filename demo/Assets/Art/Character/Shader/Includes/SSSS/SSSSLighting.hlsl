@@ -33,7 +33,6 @@ half3 Skin_SSSS_Diffuse(float3 N, Light light, float3 positionWS)
     half NoL = saturate(dot(N, L));
     float3 radiance = NoL * atten * light.color;
 
-    //==================多光源   ============================================== //
     float3 addDiffuse = GetAdditionDiffuseLights(N, positionWS);
     float3 diffuse = radiance + addDiffuse;
 
@@ -46,29 +45,23 @@ half3 Skin_SSSS_Diffuse(float3 N, Light light, float3 positionWS)
     return c;
 }
 
-half3 Skin_SSSS_Specular(float3 N, Light light, float3 positionWS, float roughness, float4 albedo,
-                         float3 RoughnessFactor, float3 SpecularColor)
+half3 Skin_SSSS_Specular(float3 N, float3 V, Light light, float3 RoughnessFactor, float3 SpecularColor)
 {
     float Lobe0Roughness = RoughnessFactor.x;
     float Lobe1Roughness = RoughnessFactor.y;
     float LobeMix = RoughnessFactor.z;
 
+    float3 L = light.direction;
     float3 H = normalize(L + V);
     float NoH = saturate(dot(N, H));
     float NoV = saturate(abs(dot(N, V)) + 1e-5);
-    float NoL = dot(N, L);
+    float NoL = saturate(dot(N, L));
     float VoH = saturate(dot(V, H));
-    
-   float3 SpecularBRDF = DualSpecularGGX(Lobe0Roughness, Lobe1Roughness, LobeMix, SpecularColor, NoH, NoV, NoL_Spec,
-                                   VoH);
 
-    //采样SSSBlurRT
-    float2 screenUV = input.screenPos.xy / input.screenPos.w;
-    float4 SkinSSSMap = SAMPLE_TEXTURE2D(_SSSBlurRT, sampler_SSSBlurRT, screenUV);
-
-    // float3 SkinSSS = BaseMap * pow(SkinSSSMap,0.45) + Specular.xyzz;
-    float3 SkinSSS = _BaseColor.rgb * BaseMap * SkinSSSMap + Specular.xyzz;
-    return SkinSSS.xyzz;
+    float3 SpecularBRDF = DualSpecularGGX(Lobe0Roughness, Lobe1Roughness, LobeMix, SpecularColor, NoH, NoV, NoL,
+                                          VoH);
+    SpecularBRDF *= light.shadowAttenuation;
+    return SpecularBRDF;
 }
 
 

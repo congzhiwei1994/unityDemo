@@ -27,8 +27,8 @@ namespace czw.SSSS
             Handle_SkinDiffuseRT.Init("Handle_SkinDiffuseRT");
             Handle_BlurRT.Init("Handle_BlurRT");
             Handle_SkinDepthRT.Init("Handle_SkinDepthRT");
+            shaderTag = new ShaderTagId(_setting.shaderTagID);
 
-            
             if (ssssMat == null)
                 ssssMat = new Material(Shader.Find("czw/Character/Skin/SSSS_Blur"));
         }
@@ -65,7 +65,7 @@ namespace czw.SSSS
             ConfigureTarget(Handle_BlurRT.id, Handle_SkinDepthRT.id);
             //将RT清空为黑
             ConfigureClear(ClearFlag.All, Color.black);
-            
+
             cmd.SetGlobalTexture(SSSSData.ID_SSSBlurRT, Handle_BlurRT.id);
             cmd.SetGlobalTexture(SSSSData.ID_SkinDepthRT, Handle_SkinDepthRT.id);
         }
@@ -73,14 +73,14 @@ namespace czw.SSSS
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             CommandBuffer cmd = CommandBufferPool.Get("SSSS CMD");
-            
+
             var drawingSettings = CreateDrawingSettings(shaderTag, ref renderingData, SortingCriteria.CommonOpaque);
             var filteringSettings = new FilteringSettings(RenderQueueRange.opaque);
             context.DrawRenderers(renderingData.cullResults, ref drawingSettings, ref filteringSettings);
-            
+
             cmd.Blit(Handle_BlurRT.id, Handle_SkinDiffuseRT.id, ssssMat, 0);
             cmd.Blit(Handle_SkinDiffuseRT.id, Handle_BlurRT.id, ssssMat, 1);
-            
+
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
         }
