@@ -40,7 +40,7 @@ Shader "czw/Character/Skin/SSSS(Seperable SubSurface Scattering)"
 
         Pass
         {
-            Name "SkinSSS_Diffuse"
+            Name "SkinSSSS"
             Tags
             {
                 "LightMode" = "SkinSSSS"
@@ -75,7 +75,7 @@ Shader "czw/Character/Skin/SSSS(Seperable SubSurface Scattering)"
 
         Pass
         {
-            Name "SkinSpcular+SkinSSS"
+             Name "ForwardLit"
             Tags
             {
                 "LightMode" = "UniversalForward"

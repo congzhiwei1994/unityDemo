@@ -19,8 +19,6 @@ float4 _DetailBumpMap_ST;
 CBUFFER_END
 
 
-TEXTURE2D(_SSSBlurRT);
-SAMPLER(sampler_SSSBlurRT);
 
 TEXTURE2D(_RoughnessMap);
 SAMPLER(sampler_RoughnessMap);

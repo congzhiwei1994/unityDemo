@@ -23,14 +23,14 @@ Shader "czw/Character/Skin/SSSS_Blur"
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment XBlur_frag
-            #pragma multi_compile _ ENABLE_SKIN_SSSS_DEBUG_ON
+            // #pragma multi_compile _ ENABLE_SKIN_SSSS_DEBUG_ON
 
 
             float4 XBlur_frag(Vertex2Fragment i) : SV_TARGET
             {
-                #ifdef ENABLE_SKIN_SSSS_DEBUG_ON
-                    return tex2Dlod(_MainTex, float4(i.uv, 0, 0));
-                #endif
+                // #ifdef ENABLE_SKIN_SSSS_DEBUG_ON
+                //     return tex2Dlod(_MainTex, float4(i.uv, 0, 0));
+                // #endif
 
                 float4 SceneColor = tex2D(_MainTex, i.uv);
                 float SSSIntencity = (_SSSScale * _ScreenSize.z);
@@ -50,16 +50,17 @@ Shader "czw/Character/Skin/SSSS_Blur"
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment YBlur_frag
-            #pragma multi_compile _ ENABLE_SKIN_SSSS_DEBUG_ON
+            // #pragma multi_compile _ ENABLE_SKIN_SSSS_DEBUG_ON
 
             float4 YBlur_frag(Vertex2Fragment i) : SV_TARGET
             {
-                #ifdef ENABLE_SKIN_SSSS_DEBUG_ON
-                    return tex2Dlod(_MainTex, float4(i.uv, 0, 0));
-                #endif
+                // #ifdef ENABLE_SKIN_SSSS_DEBUG_ON
+                //     return tex2Dlod(_MainTex, float4(i.uv, 0, 0));
+                // #endif
 
                 float4 SceneColor = tex2D(_MainTex, i.uv);
-                if (EnableSkinSSSDebug)return SceneColor;
+                if (EnableSkinSSSDebug)
+                    return SceneColor;
 
                 float SSSIntencity = (_SSSScale * _ScreenSize.w);
                 //上半部分

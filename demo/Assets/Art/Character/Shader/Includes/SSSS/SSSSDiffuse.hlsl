@@ -3,6 +3,9 @@
 
 #include "Assets/Art/Character/Shader/Includes/SSSS/SSSSLighting.hlsl"
 
+TEXTURE2D(_SSSBlurRT);
+SAMPLER(sampler_SSSBlurRT);
+
 struct Attributes
 {
     float4 positionOS : POSITION;
@@ -10,7 +13,7 @@ struct Attributes
     float4 tangentOS : TANGENT;
     float2 texcoord : TEXCOORD0;
     float2 lightmapUV : TEXCOORD1;
-    UNITY_VERTEX_INPUT_INSTANCE_ID
+
 };
 
 struct Varyings
@@ -24,25 +27,20 @@ struct Varyings
     float3 viewDirWS : TEXCOORD5;
     half4 fogFactorAndVertexLight : TEXCOORD6;
     float4 positionCS : SV_POSITION;
-    UNITY_VERTEX_INPUT_INSTANCE_ID
-    UNITY_VERTEX_OUTPUT_STEREO
+
 };
 
 
 Varyings LitPassVertex(Attributes input)
 {
     Varyings output = (Varyings)0;
-
-    UNITY_SETUP_INSTANCE_ID(input);
-    UNITY_TRANSFER_INSTANCE_ID(input, output);
-    UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
-
+    
     VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);
     VertexNormalInputs normalInput = GetVertexNormalInputs(input.normalOS, input.tangentOS);
 
     half3 viewDirWS = GetWorldSpaceViewDir(vertexInput.positionWS);
     half3 vertexLight = VertexLighting(vertexInput.positionWS, normalInput.normalWS);
-    half fogFactor = ComputeFogFactor(vertexInput.positionCS.z);
+
     real sign = input.tangentOS.w * GetOddNegativeScale();
     half4 tangentWS = half4(normalInput.tangentWS.xyz, sign);
 
@@ -54,7 +52,7 @@ Varyings LitPassVertex(Attributes input)
     OUTPUT_LIGHTMAP_UV(input.lightmapUV, unity_LightmapST, output.lightmapUV);
     OUTPUT_SH(output.normalWS.xyz, output.vertexSH);
 
-    output.fogFactorAndVertexLight = half4(fogFactor, vertexLight);
+    output.fogFactorAndVertexLight = half4(1, vertexLight);
     output.positionWS = vertexInput.positionWS;
     output.positionCS = vertexInput.positionCS;
     return output;
@@ -63,18 +61,12 @@ Varyings LitPassVertex(Attributes input)
 
 half4 LitPassFragment_Diffuse(Varyings input) : SV_Target
 {
-    UNITY_SETUP_INSTANCE_ID(input);
-    UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-
-    half4 albedoAlpha = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.uv);;
-    half3 specular = SAMPLE_TEXTURE2D(_SpecularMap, sampler_SpecularMap, input.uv);
-    half roughnessMap = SAMPLE_TEXTURE2D(_RoughnessMap, sampler_RoughnessMap, input.uv);
+    
     half occlusion = SAMPLE_TEXTURE2D(_OcclusionMap, sampler_OcclusionMap, input.uv);
 
     half4 bumpMap = SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, input.uv);
     half3 normalTS = UnpackNormalScale(bumpMap, _BumpScale);
-
-
+    
     half2 detailBumpUV = input.uv * _DetailBumpMap_ST.xy + _DetailBumpMap_ST.zw;
     half4 detailbump = SAMPLE_TEXTURE2D(_DetailBumpMap, sampler_DetailBumpMap, detailBumpUV);
     half3 detailTS = UnpackNormalScale(detailbump, _DetailScale);
@@ -96,11 +88,9 @@ half4 LitPassFragment_Diffuse(Varyings input) : SV_Target
     return half4(color, 1);
 }
 
+
 half4 LitPassFragment_Specular(Varyings input) : SV_Target
 {
-    UNITY_SETUP_INSTANCE_ID(input);
-    UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-
     half4 albedo = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.uv);;
     half3 specularMap = SAMPLE_TEXTURE2D(_SpecularMap, sampler_SpecularMap, input.uv);
     half roughnessMap = SAMPLE_TEXTURE2D(_RoughnessMap, sampler_RoughnessMap, input.uv);
@@ -143,6 +133,7 @@ half4 LitPassFragment_Specular(Varyings input) : SV_Target
 
     half3 color = diffuse * SkinSSSMap + specular;
     color = clamp(0, 1.6, color);
+    return SkinSSSMap;
     return half4(color, 1);
 }
 

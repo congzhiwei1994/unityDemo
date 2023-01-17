@@ -21,6 +21,7 @@ namespace czw.SSSS
             public Color SSSFall0ff_Color = new Color(1.0f, 0.37f, 0.3f, 1f);
             [Range(0, 100)] public float MaxDistance;
             public string shaderTagID = "SkinSSSS";
+            public Material material;
         }
 
         private SeperableSubsurfaceScatteringPass _pass;
