@@ -10,17 +10,17 @@ namespace czw.SSSS
     {
         public static void CalculateKernel(List<Vector4> kernel, int nSamples, Vector3 strength, Vector3 falloff)
         {
-            float RANGE = nSamples > 20 ? 3.0f : 2.0f;
-            float EXPONENT = 2.0f;
+            float range = nSamples > 20 ? 3.0f : 2.0f;
+            float exponent = 2.0f;
             kernel.Clear();
 
             // Calculate the SSS_Offset_UV:
-            float step = 2.0f * RANGE / (nSamples - 1);
+            float step = 2.0f * range / (nSamples - 1);
             for (int i = 0; i < nSamples; i++)
             {
-                float o = -RANGE + i * step;
+                float o = -range + i * step;
                 float sign = o < 0.0f ? -1.0f : 1.0f;
-                float w = RANGE * sign * Mathf.Abs(Mathf.Pow(o, EXPONENT)) / Mathf.Pow(RANGE, EXPONENT);
+                float w = range * sign * Mathf.Abs(Mathf.Pow(o, exponent)) / Mathf.Pow(range, exponent);
                 kernel.Add(new Vector4(0, 0, 0, w));
             }
 
@@ -73,7 +73,7 @@ namespace czw.SSSS
             }
         }
 
-        private static Vector3 gaussian(float variance, float r, Vector3 falloff)
+        private static Vector3 Gaussian(float variance, float r, Vector3 falloff)
         {
             Vector3 g;
 
@@ -91,11 +91,11 @@ namespace czw.SSSS
 
         private static Vector3 profile(float r, Vector3 falloff)
         {
-            return 0.100f * gaussian(0.0484f, r, falloff) +
-                   0.118f * gaussian(0.187f, r, falloff) +
-                   0.113f * gaussian(0.567f, r, falloff) +
-                   0.358f * gaussian(1.99f, r, falloff) +
-                   0.078f * gaussian(7.41f, r, falloff);
+            return 0.100f * Gaussian(0.0484f, r, falloff) +
+                   0.118f * Gaussian(0.187f, r, falloff) +
+                   0.113f * Gaussian(0.567f, r, falloff) +
+                   0.358f * Gaussian(1.99f, r, falloff) +
+                   0.078f * Gaussian(7.41f, r, falloff);
         }
     }
 }

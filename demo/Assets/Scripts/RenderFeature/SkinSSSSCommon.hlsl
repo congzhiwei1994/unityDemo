@@ -79,15 +79,13 @@ float4 SkinSSSSFragment(Varyings input) : SV_Target
     half3x3 tangentToWorld = half3x3(input.tangentWS.xyz, input.bitangentWS.xyz, input.normalWS.xyz);
 
     float3 N = normalize(TransformTangentToWorld(normalTS, tangentToWorld));
-
     float4 shadowCoord = TransformWorldToShadowCoord(input.positionWS);
     Light mainLight = GetMainLight(shadowCoord);
 
+    
     #ifdef SKIN_SSSS_DIFFUSE
     float NL = dot(N, L);
     float3 directDiffuse = saturate(NL) * mainLight.shadowAttenuation * mainLight.color;
-
-    //==================多光源   ============================================== //
     float3 additionalDiffuse = GetAdditionDiffuseLights(N, input.positionWS);
     directDiffuse += additionalDiffuse;
 
@@ -111,28 +109,14 @@ float4 SkinSSSSFragment(Varyings input) : SV_Target
 
     float4 BaseMap = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.uv);
     float3 Specular = 0;
-    UNITY_BRANCH if (_EnableBaseMapEyeMask)
-    {
-        // Roughness = _RoughnessEye*BaseMap.a;
-        Specular = BaseMap.a * _SpecIntensityEye * Specular_GGX(N, L, V, _RoughnessEye, (0.04).xxx) * mainLight.
-            shadowAttenuation;
-        // return Roughness;
-    }
-
-    // #if !defined(ENABLE_BECKMAN_ON)
+    
     float3 SpecularGGX1 = Specular_GGX_Skin(N, L, V, Roughness, (0.04).xxx) * mainLight.shadowAttenuation;
     float3 SpecularGGX2 = Specular_GGX_Skin(N, L, V, _Roughness2, (0.04).xxx) * mainLight.shadowAttenuation;
     Specular += max(SpecularGGX1, SpecularGGX2) * mainLight.color;
-    // #else
-    //         float3 SpecularBeckman1 = Specular_Beckman_Skin(N,L,V,_BeckmanRoughness,_BeckmanIntensity*0.1);
-    //         Specular += SpecularBeckman1* mainLight.color* mainLight.shadowAttenuation;
-    // #endif
 
-    //采样SSSBlurRT
     float2 screenUV = input.screenPos.xy / input.screenPos.w;
     float4 SkinSSSMap = SAMPLE_TEXTURE2D(_SSSBlurRT, sampler_SSSBlurRT, screenUV);
 
-    // float3 SkinSSS = BaseMap * pow(SkinSSSMap,0.45) + Specular.xyzz;
     half3 diffuse = _BaseColor.rgb * BaseMap;
     float3 SkinSSS = diffuse * SkinSSSMap + Specular.xyzz;
     return SkinSSSMap.xyzz;
@@ -219,18 +203,5 @@ float4 SkinSSSFragment(Varyings input) : SV_Target
     float3 SkinSSS = Diffuse + Specular.xyzz;
     return SkinSSS.xyzz;
 }
-
-// struct SkinMRT
-// {
-//     float4 Color;
-//     float4 Depth;
-// };
-// SkinMRT SkinFragmentMRT(Varyings input)
-// {
-//     SkinMRT mrt = (SkinMRT)0;
-//     mrt.Color = LitPassFragment(input);
-//     mrt.Depth = input.positionCS.z;
-//     return mrt;
-// }
 
 #endif

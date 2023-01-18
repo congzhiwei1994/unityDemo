@@ -33,7 +33,7 @@ Shader "Hidden/SeparableSubsurfaceScatter"
             #pragma multi_compile _ ENABLE_SKIN_SSSS_DEBUG_ON
             
 
-            float4 XBlur_frag(Vertex2Fragment i) : SV_TARGET
+            float4 XBlur_frag(v2f i) : SV_TARGET
             {
                 #ifdef ENABLE_SKIN_SSSS_DEBUG_ON
                     return tex2Dlod(_MainTex, float4(i.uv, 0, 0));
@@ -59,7 +59,7 @@ Shader "Hidden/SeparableSubsurfaceScatter"
             #pragma fragment YBlur_frag
             #pragma multi_compile _ ENABLE_SKIN_SSSS_DEBUG_ON
 
-            float4 YBlur_frag(Vertex2Fragment i) : SV_TARGET
+            float4 YBlur_frag(v2f i) : SV_TARGET
             {
                 #ifdef ENABLE_SKIN_SSSS_DEBUG_ON
                     return tex2Dlod(_MainTex, float4(i.uv, 0, 0));

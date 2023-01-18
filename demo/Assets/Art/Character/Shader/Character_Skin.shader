@@ -6,13 +6,12 @@ Shader "czw/Character/Skin/SSSS(Seperable SubSurface Scattering)"
         [MainTexture] _BaseMap("Albedo", 2D) = "white" {}
         [MainColor] _BaseColor("Color", Color) = (1,1,1,1)
 
-
         [Space(10)]
         [Header(Normal map)]
         _BumpMap("BumpMap", 2D) = "bump" {}
-        _BumpScale("Bump Scale", Float) = 1.0
+        _BumpScale("Bump Scale", Range(0.0, 1.0)) = 1.0
         _DetailBumpMap("Detail BumpMap", 2D) = "bump" {}
-        _DetailScale("Detail Scale", Float) = 1.0
+        _DetailScale("Detail Scale", Range(0.0, 1.0)) = 1.0
         [NOScaleOffset] _DetailMaskMap("DetailMaskMap", 2D) = "white" {}
 
         [Space(10)]
@@ -36,11 +35,10 @@ Shader "czw/Character/Skin/SSSS(Seperable SubSurface Scattering)"
         {
             "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline" "UniversalMaterialType" = "Lit" "IgnoreProjector" = "True" "ShaderModel"="4.5"
         }
-        LOD 300
 
         Pass
         {
-            Name "SkinSSSS"
+            Name "SkinSSS_Diffuse"
             Tags
             {
                 "LightMode" = "SkinSSSS"
@@ -49,16 +47,16 @@ Shader "czw/Character/Skin/SSSS(Seperable SubSurface Scattering)"
             HLSLPROGRAM
             #pragma target 4.5
 
-            // Universal Pipeline keywords
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _REFLECTION_PROBE_BLENDING
+            #pragma multi_compile_fragment _ _REFLECTION_PROBE_BOX_PROJECTION
             #pragma multi_compile_fragment _ _SHADOWS_SOFT
             #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
 
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
+            #pragma multi_compile _ DISABLE_SH
+            #pragma multi_compile _ DISABLE_SPECULAR
 
             #pragma vertex LitPassVertex
             #pragma fragment LitPassFragment_Diffuse
@@ -68,14 +66,14 @@ Shader "czw/Character/Skin/SSSS(Seperable SubSurface Scattering)"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-            #include"Assets/Art/Character/Shader/Includes/SSSS/SSSSInput.hlsl"
-            #include"Assets/Art/Character/Shader/Includes/SSSS/SSSSDiffuse.hlsl"
+            #include"Assets/Art/Character/Shader/Includes/SSSS/SSSS_SkinInput.hlsl"
+            #include"Assets/Art/Character/Shader/Includes/SSSS/SSSS_SkinForwarld.hlsl"
             ENDHLSL
         }
 
         Pass
         {
-             Name "ForwardLit"
+            Name "ForwardLit"
             Tags
             {
                 "LightMode" = "UniversalForward"
@@ -103,8 +101,8 @@ Shader "czw/Character/Skin/SSSS(Seperable SubSurface Scattering)"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-            #include"Assets/Art/Character/Shader/Includes/SSSS/SSSSInput.hlsl"
-            #include"Assets/Art/Character/Shader/Includes/SSSS/SSSSDiffuse.hlsl"
+            #include"Assets/Art/Character/Shader/Includes/SSSS/SSSS_SkinInput.hlsl"
+            #include"Assets/Art/Character/Shader/Includes/SSSS/SSSS_SkinForwarld.hlsl"
             ENDHLSL
         }
 
@@ -140,40 +138,6 @@ Shader "czw/Character/Skin/SSSS(Seperable SubSurface Scattering)"
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
-            ENDHLSL
-        }
-
-        Pass
-        {
-            Name "DepthNormals"
-            Tags
-            {
-                "LightMode" = "DepthNormals"
-            }
-
-            ZWrite On
-            Cull[_Cull]
-
-            HLSLPROGRAM
-            #pragma exclude_renderers gles gles3 glcore
-            #pragma target 4.5
-
-            #pragma vertex DepthNormalsVertex
-            #pragma fragment DepthNormalsFragment
-
-            // -------------------------------------
-            // Material Keywords
-            #pragma shader_feature_local _NORMALMAP
-            #pragma shader_feature_local_fragment _ALPHATEST_ON
-            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-
-            //--------------------------------------
-            // GPU Instancing
-            #pragma multi_compile_instancing
-            #pragma multi_compile _ DOTS_INSTANCING_ON
-
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthNormalsPass.hlsl"
             ENDHLSL
         }
     }

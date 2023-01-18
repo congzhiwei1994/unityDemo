@@ -79,10 +79,12 @@ namespace czw.SSSS
             var drawingSettings = CreateDrawingSettings(shaderTag, ref renderingData, SortingCriteria.CommonOpaque);
             var filteringSettings = new FilteringSettings(RenderQueueRange.opaque);
             context.DrawRenderers(renderingData.cullResults, ref drawingSettings, ref filteringSettings);
-
+            
+            Debug(material);
+            
             cmd.Blit(Handle_BlurRT.id, Handle_SkinDiffuseRT.id, material, 0);
             cmd.Blit(Handle_SkinDiffuseRT.id, Handle_BlurRT.id, material, 1);
-
+            
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
         }
@@ -92,6 +94,14 @@ namespace czw.SSSS
             cmd.ReleaseTemporaryRT(Handle_SkinDiffuseRT.id);
             cmd.ReleaseTemporaryRT(Handle_BlurRT.id);
             cmd.ReleaseTemporaryRT(Handle_SkinDepthRT.id);
+        }
+
+        private void Debug(Material material)
+        {
+            if (_setting.DisableSSSSS)
+                material.EnableKeyword("ENABLE_SKIN_SSSS_DEBUG_ON");
+            else
+                material.DisableKeyword("ENABLE_SKIN_SSSS_DEBUG_ON");
         }
     }
 }
