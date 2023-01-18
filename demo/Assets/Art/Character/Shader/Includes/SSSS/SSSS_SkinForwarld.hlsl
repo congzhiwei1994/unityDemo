@@ -125,8 +125,8 @@ half4 LitPassFragment_Specular(Varyings input) : SV_Target
     half3 specualrColor = specularMap * _Specular * 0.08;
 
     half3 specular = SkinSSSS_DirectSpecular(normalWS, viewDirWS, mainLight, roughnessFactor, specualrColor);
-
-    half3 color = diffuse * SkinSSSMap + specular;
+half3 indirectSpecular = IndirectSpecualr(normalWS, viewDirWS, roughnessFactor, specualrColor);
+    half3 color = diffuse * SkinSSSMap + specular + indirectSpecular;
 
 
     return half4(color, 1);

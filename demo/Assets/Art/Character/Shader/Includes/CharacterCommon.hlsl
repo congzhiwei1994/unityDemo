@@ -80,5 +80,33 @@ float3 DualSpecularGGX(float Lobe0Roughness, float Lobe1Roughness, float LobeMix
     return (D * Vis) * F;
 }
 
+half3 EnvBRDFApprox(half3 SpecularColor, half Roughness, half NoV)
+{
+    // [ Lazarov 2013, "Getting More Physical in Call of Duty: Black Ops II" ]
+    // Adaptation to fit our G term.
+    const half4 c0 = {-1, -0.0275, -0.572, 0.022};
+    const half4 c1 = {1, 0.0425, 1.04, -0.04};
+    half4 r = Roughness * c0 + c1;
+    half a004 = min(r.x * r.x, exp2(-9.28 * NoV)) * r.x + r.y;
+    half2 AB = half2(-1.04, 1.04) * a004 + r.zw;
+
+    // Anything less than 2% is physically impossible and is instead considered to be shadowing
+    // Note: this is needed for the 'specular' show flag to work, since it uses a SpecularColor of 0
+    AB.y *= saturate(50.0 * SpecularColor.g);
+
+    return SpecularColor * AB.x + AB.y;
+}
+
+
+half3 SpecularIBL(float3 R, float3 WorldPos, float Roughness, float3 SpecularColor, float NoV)
+{
+    #ifndef SHADERGRAPH_PREVIEW
+    half3 SpeucularLD = GlossyEnvironmentReflection(R, Roughness, 1.0f);
+    half3 SpecularDFG = EnvBRDFApprox(SpecularColor, Roughness, NoV);
+    return SpeucularLD * SpecularDFG;
+    #endif
+    return 0;
+}
+
 
 #endif

@@ -56,5 +56,21 @@ half3 SkinSSSS_DirectSpecular(float3 N, float3 V, Light light, float3 RoughnessF
     return SpecularBRDF;
 }
 
+half3 IndirectSpecualr(float3 N, float3 V, float3 RoughnessFactor, half3 SpecularColor)
+{
+    float Lobe0Roughness = RoughnessFactor.x;
+    float Lobe1Roughness = RoughnessFactor.y;
+    float LobeMix = RoughnessFactor.z;
+
+    float NoV = saturate(abs(dot(N, V)) + 1e-5);
+    half3 R = reflect(-V, N);
+
+    half3 SpecularLobe0 = SpecularIBL(R, 1, Lobe0Roughness, SpecularColor, NoV);
+    half3 SpecularLobe1 = SpecularIBL(R, 1, Lobe1Roughness, SpecularColor, NoV);
+    half3 DualLobe = lerp(SpecularLobe0, SpecularLobe1, 1.0 - LobeMix);
+
+    return DualLobe;
+}
+
 
 #endif
