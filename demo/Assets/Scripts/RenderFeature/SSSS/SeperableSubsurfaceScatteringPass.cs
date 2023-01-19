@@ -70,7 +70,7 @@ namespace czw.SSSS
 
             cmd.SetGlobalTexture(SSSSData.ID_SSSBlurRT, Handle_BlurRT.id);
             cmd.SetGlobalTexture(SSSSData.ID_SkinDepthRT, Handle_SkinDepthRT.id);
-        }
+        }  
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
@@ -98,7 +98,7 @@ namespace czw.SSSS
 
         private void Debug(Material material)
         {
-            if (_setting.DisableSSSSS)
+            if (_setting.DisableSkin)
                 material.EnableKeyword("ENABLE_SKIN_SSSS_DEBUG_ON");
             else
                 material.DisableKeyword("ENABLE_SKIN_SSSS_DEBUG_ON");

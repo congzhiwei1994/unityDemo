@@ -143,8 +143,8 @@ Material:
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _Roughness: 0.545
-    - _Roughness0: 0.515
-    - _Roughness1: 0.35
+    - _Roughness0: 0.386
+    - _Roughness1: 0.574
     - _Roughness2: 0.37
     - _RoughnessEye: 0.545
     - _RoughnessMix: 0.85

@@ -61,6 +61,5 @@ float4 SeparableSubsurface(float4 SceneColor, float2 UV, float2 direction, float
         SSSSceneColor.rgb = lerp(SSSSceneColor.rgb, SceneColor.rgb, SSSScale); //在原像素与周围像素之间进行插值，相当于周围的像素影响到了原像素 
         BlurSceneColor.rgb += _Kernel[i].rgb * SSSSceneColor.rgb;
     }
-    // return  tex2D(_MainTex, UV);
     return BlurSceneColor;
 }

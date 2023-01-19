@@ -14,7 +14,7 @@ namespace czw.SSSS
         public class Setting
         {
             public RenderPassEvent _event = RenderPassEvent.BeforeRenderingOpaques;
-            public bool DisableSSSSS = false;
+            public bool DisableSkin = false;
             public bool DisableSH = false;
             public bool DisableSpecular = false;
             [Range(0, 5)] public float SubsurfaceScaler = 0.25f;

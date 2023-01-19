@@ -599,6 +599,10 @@ PrefabInstance:
       value: SK_RYU_CASUAL_02Green
       objectReference: {fileID: 0}
     - target: {fileID: 2081097999405766831, guid: 9f09955589d142f48833dda0cc594337, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2081097999405766831, guid: 9f09955589d142f48833dda0cc594337, type: 3}
       propertyPath: m_DynamicOccludee
       value: 1
       objectReference: {fileID: 0}

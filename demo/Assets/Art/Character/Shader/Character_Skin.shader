@@ -88,10 +88,6 @@ Shader "czw/Character/Skin/SSSS(Seperable SubSurface Scattering)"
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
             #pragma multi_compile_fragment _ _SHADOWS_SOFT
-            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
-
-            #pragma multi_compile_fog
-            #pragma multi_compile_instancing
 
             #pragma vertex LitPassVertex
             #pragma fragment LitPassFragment_Specular
