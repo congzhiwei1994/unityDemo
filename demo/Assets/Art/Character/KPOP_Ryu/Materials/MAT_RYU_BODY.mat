@@ -135,12 +135,12 @@ Material:
     - _Parallax: 0.02
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _Roughness0: 0.35
-    - _Roughness1: 0.265
+    - _Roughness0: 0.633
+    - _Roughness1: 0.25
     - _RoughnessMix: 0.85
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
-    - _Specular: 0.027
+    - _Specular: 0.04
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0

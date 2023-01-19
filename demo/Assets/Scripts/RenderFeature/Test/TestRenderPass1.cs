@@ -1,45 +1,51 @@
-ï»¿using UnityEngine;
+using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 namespace Test.RenderFeature
 {
-    public class TestRenderPass0 : ScriptableRenderPass
+    public class TestRenderPass1 : ScriptableRenderPass
     {
         private TestRenderFeature.Setting _setting;
         private RenderTargetIdentifier source;
         private RenderTargetIdentifier dest;
         private int tempRT_ID;
 
-        public TestRenderPass0(TestRenderFeature.Setting _setting)
+        public TestRenderPass1(TestRenderFeature.Setting _setting)
         {
             this._setting = _setting;
+
             tempRT_ID = Shader.PropertyToID("_TempRT");
         }
 
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
-            // æºçº¹ç†
             source = renderingData.cameraData.renderer.cameraColorTarget;
-            // å½“å‰ç›¸æœºçš„æè¿°
             var descriptor = renderingData.cameraData.cameraTargetDescriptor;
-            // æ ¹æ®å½“å‰ç›¸æœºçš„æè¿°ï¼Œåœ¨cmdä¸­è·å–ä¸´æ—¶RTçš„ID
             cmd.GetTemporaryRT(tempRT_ID, descriptor);
-            // é€šè¿‡ tempRT_ID æ¥å®ä¾‹ä¸€ä¸ª RenderTargetIdentifier(RTæ ‡è¯†ç¬¦)
             dest = new RenderTargetIdentifier(tempRT_ID);
         }
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
-            var cmd = CommandBufferPool.Get("Test cmd");
+            if (_setting.material == null)
+                return;
 
+            var cmd = CommandBufferPool.Get("Test cmd1");
+            Blit(cmd, source, dest);
+            cmd.SetGlobalTexture(_setting.globalName_ShaderTex, dest);
             _setting.material.SetColor(_setting.materialName_mainColor, _setting.color);
 
-            // å°† source ä¸­çš„ä¿¡æ¯ copy åˆ° dest ä¸­ã€‚
-            cmd.Blit(source, dest, _setting.material, 0);
-            // å†å°† dest copy åˆ° source
-            cmd.Blit(dest, source);
-            // æ‰§è¡Œ cmd
+            cmd.SetRenderTarget(source);
+
+            // ÉèÖÃVP¾ØÕó
+            cmd.SetViewProjectionMatrices(Matrix4x4.identity, Matrix4x4.identity);
+            // »æÖÆÈ«ÆÁµÄMesh
+            cmd.DrawMesh(RenderingUtils.fullscreenMesh, Matrix4x4.identity, _setting.material, 0, 0);
+            // DrawMeshÖ®ºóÒªÉèÖÃ»ØÖ®Ç°µÄVP¾ØÕó£¬·ñÔòºóÃæ»­µÄÎïÌåµÄ¾ØÕóÊÇ´íÎóµÄ
+            cmd.SetViewProjectionMatrices(renderingData.cameraData.GetViewMatrix(),
+                renderingData.cameraData.GetProjectionMatrix());
+
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
         }
