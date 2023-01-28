@@ -34,13 +34,14 @@ v2f vert(appdata v)
 
 float4 SeparableSubsurface(float4 SceneColor, float2 UV, float2 direction, float Scale)
 {
-    float DistanceToProjectionWindow = 1.0 / tan(0.5 * radians(_FOV));
-    //300是相机的远裁剪距离，相当于求出最远距离 再屏幕上的大小
-    float D300 = DistanceToProjectionWindow * 300;
+    float alpha = 1.0 / tan(0.5 * radians(_FOV));
+    float far = 300.0f;
+    // 求出最远距离在屏幕上的大小
+    float farDistance = alpha * far;
 
     float eyeDepth = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_SkinDepthRT, UV));
-    //模糊的长度
-    float BlurLength = DistanceToProjectionWindow / eyeDepth; 
+    //模糊的长度，深度越大模糊的越小
+    float BlurLength = alpha / eyeDepth; 
     
     float2 UVOffset = direction * BlurLength; //模糊像素的长度
     float4 BlurSceneColor = SceneColor;
@@ -55,7 +56,7 @@ float4 SeparableSubsurface(float4 SceneColor, float2 UV, float2 direction, float
         float SSSDepth = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_SkinDepthRT, SSSUV)).r; //周围像素的深度
         float delta = abs(eyeDepth - SSSDepth); //如果原像素与目标像素差距过大，那么不进行次表面散射操作
 
-        float SSSScale = saturate(D300 * Scale * delta);
+        float SSSScale = saturate(farDistance * Scale * delta);
         if (delta > _MaxDistance)
             SSSScale = 1;
         SSSSceneColor.rgb = lerp(SSSSceneColor.rgb, SceneColor.rgb, SSSScale); //在原像素与周围像素之间进行插值，相当于周围的像素影响到了原像素 
