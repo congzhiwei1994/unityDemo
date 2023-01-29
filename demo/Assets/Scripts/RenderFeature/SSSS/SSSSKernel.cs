@@ -6,7 +6,7 @@ namespace czw.SSSS
     /// <summary>
     /// https://github.com/iryoku/separable-sss/blob/master/Demo/Code/SeparableSSS.cpp
     /// </summary>
-    public class SSSSUtils
+    public class SSSSKernel
     {
         public static void CalculateKernel(List<Vector4> kernel, int nSamples, Vector3 strength, Vector3 falloff)
         {

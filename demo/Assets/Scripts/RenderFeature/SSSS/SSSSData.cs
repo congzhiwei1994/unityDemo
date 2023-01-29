@@ -9,7 +9,7 @@ namespace czw.SSSS
         public static int ID_ScreenSize = Shader.PropertyToID("_ScreenSize");
         public static int ID_FOV = Shader.PropertyToID("_FOV");
         public static int ID_MaxDistance = Shader.PropertyToID("_MaxDistance");
-        public static int ID_SSSBlurRT = Shader.PropertyToID("_SSSBlurRT");
-        public static int ID_SkinDepthRT = Shader.PropertyToID("_SkinDepthRT");
+        public static int ID_DiffuseRT = Shader.PropertyToID("_SSSBlurRT");
+        public static int ID_DepthRT = Shader.PropertyToID("_SkinDepthRT");
     }
 }
