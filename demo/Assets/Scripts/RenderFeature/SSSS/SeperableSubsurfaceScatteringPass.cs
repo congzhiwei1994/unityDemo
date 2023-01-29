@@ -39,9 +39,17 @@ namespace czw.SSSS
             if (material == null)
                 return;
 
+            var desc = renderingData.cameraData.cameraTargetDescriptor;
+            desc.enableRandomWrite = true;
+            cmd.GetTemporaryRT(handle_DiffuseTemp.id, desc.width, desc.height, 0);
+            cmd.GetTemporaryRT(handle_Diffuse.id, desc.width, desc.height, 0);
+            cmd.GetTemporaryRT(handle_Depth.id, desc.width, desc.height, 24, FilterMode.Point,
+                RenderTextureFormat.Depth);
+            
+            
             // 不需要每帧都计算
-            if (SSS_ColorOld != _setting.SSS_Color || SSSFall0ff_ColorOld != _setting.SSSFall0ff_Color)
-            {
+            // if (SSS_ColorOld != _setting.SSS_Color || SSSFall0ff_ColorOld != _setting.SSSFall0ff_Color)
+            // {
                 SSS_ColorOld = _setting.SSS_Color;
                 SSSFall0ff_ColorOld = _setting.SSSFall0ff_Color;
                 
@@ -53,24 +61,16 @@ namespace czw.SSSS
                 Vector3 SSSFC = Vector3.Normalize(sssFallOff);
 
                 SSSSKernel.CalculateKernel(KernelArray, 32, SSSC, SSSFC);
-            }
-
-            var desc = renderingData.cameraData.cameraTargetDescriptor;
-            desc.enableRandomWrite = true;
-
-            cmd.GetTemporaryRT(handle_DiffuseTemp.id, desc.width, desc.height, 0);
-            cmd.GetTemporaryRT(handle_Diffuse.id, desc.width, desc.height, 0);
-            cmd.GetTemporaryRT(handle_Depth.id, desc.width, desc.height, 24, FilterMode.Point,
-                RenderTextureFormat.Depth);
-
-            var screenFactor = new Vector4(desc.width, desc.height, 1f / desc.width, 1f / desc.height);
-            material.SetVector(SSSSData.ID_ScreenSize, screenFactor);
-            material.SetVectorArray(SSSSData.ID_Kernel, KernelArray);
-            material.SetFloat(SSSSData.ID_SSSScaler, _setting.SubsurfaceScaler);
-            material.SetFloat(SSSSData.ID_ScreenSize, _setting.SubsurfaceScaler);
-            material.SetFloat(SSSSData.ID_FOV, renderingData.cameraData.camera.fieldOfView);
-            material.SetFloat(SSSSData.ID_MaxDistance, _setting.MaxDistance);
-
+                
+                var screenFactor = new Vector4(desc.width, desc.height, 1f / desc.width, 1f / desc.height);
+                material.SetVector(SSSSData.ID_ScreenSize, screenFactor);
+                material.SetVectorArray(SSSSData.ID_Kernel, KernelArray);
+                material.SetFloat(SSSSData.ID_SSSScaler, _setting.SubsurfaceScaler);
+                material.SetFloat(SSSSData.ID_ScreenSize, _setting.SubsurfaceScaler);
+                material.SetFloat(SSSSData.ID_FOV, renderingData.cameraData.camera.fieldOfView);
+                material.SetFloat(SSSSData.ID_MaxDistance, _setting.MaxDistance);
+            // }
+            
             ConfigureClear(ClearFlag.All, Color.black);
             //将这个RT设置为Render Target
             ConfigureTarget(handle_Diffuse.id, handle_Depth.id);

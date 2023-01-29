@@ -25,10 +25,10 @@ struct SSSSInput
 };
 
 
-// float Pow4(float x)
-// {
-//     return (x * x) * (x * x);
-// }
+inline half Pow2(half x)
+{
+    return x * x;
+}
 
 inline half Pow5(half x)
 {
