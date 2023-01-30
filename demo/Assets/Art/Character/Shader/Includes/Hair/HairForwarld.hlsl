@@ -68,8 +68,10 @@ half4 LitPassFragment(Varyings input) : SV_Target
     noise += half3(0, 1, 0);
     float3 normalWS = TransformTangentToWorld(noise, tbn);
 
+    half depth = SAMPLE_TEXTURE2D(_DepthMap, sampler_DepthMap, input.uv).r;
+    
     HairData hair_data;
-    hair_data.diffuse = baseMap.rgb;
+    hair_data.diffuse =  baseMap.rgb;
     hair_data.specular = half3(_Specular, _Specular, _Specular);
     hair_data.roughness = _Roughness;
     hair_data.scatter = _Scatter;
@@ -77,7 +79,7 @@ half4 LitPassFragment(Varyings input) : SV_Target
     hair_data.viewWS = normalize(input.viewDirWS);
     hair_data.ShadowCoord = TransformWorldToShadowCoord(input.positionWS);
     hair_data.positionWS = input.positionWS;
-    hair_data.bakedGI = SampleSH(hair_data.normalWS);
+    hair_data.bakedGI = SampleSH(hair_data.normalWS) * depth;
 
     half3 color = HairLighting(hair_data);
     clip(alpha - _HairClip);

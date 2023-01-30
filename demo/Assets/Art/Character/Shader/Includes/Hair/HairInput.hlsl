@@ -26,4 +26,7 @@ SAMPLER(sampler_FlowMap);
 TEXTURE2D(_IDMap);
 SAMPLER(sampler_IDMap);
 
+TEXTURE2D(_DepthMap);
+SAMPLER(sampler_DepthMap);
+
 #endif
