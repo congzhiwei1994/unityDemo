@@ -8,7 +8,8 @@ Shader "czw/Character/Hair"
         [NOScaleOffset] _OpacityMap("OpacityMap", 2D) = "white" {}
         [NOScaleOffset] _FlowMap("FlowMap", 2D) = "white" {}
         [NOScaleOffset] _IDMap("IDMap", 2D) = "white" {}
-
+        [NOScaleOffset] _DepthMap("DepthMap", 2D) = "white" {}
+        
         [Space(10)]
         _HairClip("HairClip", Range(0.0, 1.0)) = 0.5
         _Specular("Specular", Range(0.0, 1.0)) = 0.5
