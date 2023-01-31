@@ -18,6 +18,7 @@ namespace czw.DepthPeeling
             public string passTags = "DepthPeeling";
             public RenderQueueType renderQueueType = RenderQueueType.Transparent;
             public SortingCriteria sortingCriteria = SortingCriteria.CommonOpaque;
+            public string shaderDepthTexName = "_MaxDepthTex";
         }
 
         public Setting setting = new Setting();

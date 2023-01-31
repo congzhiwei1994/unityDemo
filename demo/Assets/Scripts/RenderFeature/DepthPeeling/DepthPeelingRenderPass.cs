@@ -63,6 +63,12 @@ namespace czw.DepthPeeling
 
                 cmd.GetTemporaryRT(colorRTs[i], width, height, 0);
                 cmd.GetTemporaryRT(depthRTs[i], width, height, 32, FilterMode.Point, RenderTextureFormat.RFloat);
+
+                // 只传大于第一层的深度
+                if (i > 0)
+                    cmd.SetGlobalTexture(setting.shaderDepthTexName, depthRTs[i - 1]);
+
+                cmd.SetRenderTarget(new RenderTargetIdentifier[] { colorRTs[i], depthRTs[i] }, depthRTs[i]);
             }
         }
     }
