@@ -13,6 +13,9 @@ namespace czw.DepthPeeling
         private ProfilingSampler profilingSampler;
         private FilteringSettings filteringSettings;
 
+        List<int> colorRTs;
+        List<int> depthRTs;
+
         public DepthPeelingRenderPass(DepthPeelingRenderFeature.Setting setting)
         {
             this.setting = setting;
@@ -28,6 +31,10 @@ namespace czw.DepthPeeling
 
             filteringSettings = new FilteringSettings(renderQueueRange);
             profilingSampler = new ProfilingSampler(setting.passTags + setting.renderQueueType);
+
+
+            colorRTs = new List<int>(setting.passNumber);
+            depthRTs = new List<int>(setting.passNumber);
         }
 
 
@@ -41,9 +48,21 @@ namespace czw.DepthPeeling
                 // Start profilling
                 context.ExecuteCommandBuffer(cmd);
                 cmd.Clear();
+            }
+        }
 
-                List<int> colorRTs = new List<int>(setting.passNumber);
-                List<int> depthRTs = new List<int>(setting.passNumber);
+        /// <summary>
+        /// 从前往后画 半透明颜色RT 
+        /// </summary>
+        private void DrawFrontToBack(CommandBuffer cmd, int width, int height)
+        {
+            for (int i = 0; i < setting.passNumber; i++)
+            {
+                colorRTs.Add(Shader.PropertyToID($"_DepthPeelingColor{i}"));
+                depthRTs.Add(Shader.PropertyToID($"_DepthPeelingDepth{i}"));
+
+                cmd.GetTemporaryRT(colorRTs[i], width, height, 0);
+                cmd.GetTemporaryRT(depthRTs[i], width, height, 32, FilterMode.Point, RenderTextureFormat.RFloat);
             }
         }
     }
