@@ -14,7 +14,10 @@ namespace czw.FlowMapTool
     public class FlowMap : MonoBehaviour
     {
         private FlowMapResolution _resolution = FlowMapResolution._1024;
+        public int areaSize = 200;
+        public Vector3 areaPos = Vector3.zero;
         
+
         private void OnEnable()
         {
         }
