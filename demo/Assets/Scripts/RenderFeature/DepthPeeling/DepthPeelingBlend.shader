@@ -82,8 +82,6 @@ Shader "czw/Character/Hair/DepthPeelingBlend"
                 discard;
             }
             #endif
-
-
             return color;
         }
         ENDHLSL

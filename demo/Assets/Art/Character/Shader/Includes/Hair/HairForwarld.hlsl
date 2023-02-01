@@ -96,16 +96,13 @@ half4 HairShadingColor(Varyings input)
 DepthPeelingOutput DepthPeelingFragment(Varyings input)
 {
     DepthPeelingOutput output;
-    
     output.color = HairShadingColor(input);
     output.depth = input.positionCS.z;
-
     // 第一次循环，直接画颜色与深度
     UNITY_BRANCH if (_DepthPeelingPassCount == 0)
     {
         return output;
     }
-
     float2 screenUV = input.positionCS.xy / _ScreenParams.xy;
     float depthTex = SAMPLE_TEXTURE2D(_MaxDepthTex, sampler_MaxDepthTex, screenUV).r;
 
@@ -121,7 +118,6 @@ DepthPeelingOutput DepthPeelingFragment(Varyings input)
         discard;
     }
     #endif
-
     return output;
 }
 #endif

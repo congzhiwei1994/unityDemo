@@ -53,6 +53,9 @@ namespace czw.DepthPeeling
             profilingSampler = new ProfilingSampler(passTag + setting.renderQueueType);
 
             ID_DepthPeelingPassCount = Shader.PropertyToID(passCountName);
+            
+            colorRTs = new List<int>(setting.passNumber);
+            depthRTs = new List<int>(setting.passNumber);
         }
 
 
@@ -63,14 +66,13 @@ namespace czw.DepthPeeling
             var width = renderingData.cameraData.camera.pixelWidth;
             var height = renderingData.cameraData.camera.pixelHeight;
             var cmd = CommandBufferPool.Get("Depth Peeling");
+
             using (new ProfilingScope(cmd, profilingSampler))
             {
                 context.ExecuteCommandBuffer(cmd);
                 cmd.Clear();
 
-                colorRTs = new List<int>(setting.passNumber);
-                depthRTs = new List<int>(setting.passNumber);
-
+               
                 for (int i = 0; i < setting.passNumber; i++)
                 {
                     colorRTs.Add(Shader.PropertyToID($"_DepthPeelingColor{i}"));
@@ -79,6 +81,7 @@ namespace czw.DepthPeeling
                     // 获取RT,其中depthRT的FilterMode 必须为 point
                     cmd.GetTemporaryRT(colorRTs[i], width, height, 0);
                     cmd.GetTemporaryRT(depthRTs[i], width, height, 32, FilterMode.Point, RenderTextureFormat.RFloat);
+                    // 将pass数传给shader
                     cmd.SetGlobalInt(ID_DepthPeelingPassCount, i);
 
                     // 第一次循环，不需要把深度传进shader，第二次循环就将上一次的深度传进shader，来进行深度比较
