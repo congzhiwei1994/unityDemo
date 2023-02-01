@@ -29,4 +29,17 @@ SAMPLER(sampler_IDMap);
 TEXTURE2D(_DepthMap);
 SAMPLER(sampler_DepthMap);
 
+// ------------------------------------------------
+// depth peeling
+TEXTURE2D(_MainTex);
+SAMPLER(sampler_MainTex);
+
+TEXTURE2D(_MaxDepthTex);
+SAMPLER(sampler_MaxDepthTex);
+
+TEXTURE2D(_CameraDepthTexture);
+SAMPLER(sampler_CameraDepthTexture);
+
+int _DepthPeelingPassCount;
+
 #endif

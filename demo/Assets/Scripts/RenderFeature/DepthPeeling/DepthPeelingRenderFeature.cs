@@ -15,10 +15,8 @@ namespace czw.DepthPeeling
         {
             public RenderPassEvent _event = RenderPassEvent.AfterRenderingOpaques;
             [Range(0, 10)] public int passNumber = 5;
-            public string passTags = "DepthPeeling";
             public RenderQueueType renderQueueType = RenderQueueType.Transparent;
             public SortingCriteria sortingCriteria = SortingCriteria.CommonOpaque;
-            public string shaderDepthTexName = "_MaxDepthTex";
         }
 
         public Setting setting = new Setting();
@@ -32,6 +30,7 @@ namespace czw.DepthPeeling
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
             pass.renderPassEvent = setting._event;
+            pass.Setup(renderer.cameraColorTarget, renderer);
             renderer.EnqueuePass(pass);
         }
     }

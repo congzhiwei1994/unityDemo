@@ -9,7 +9,7 @@ Shader "czw/Character/Hair"
         [NOScaleOffset] _FlowMap("FlowMap", 2D) = "white" {}
         [NOScaleOffset] _IDMap("IDMap", 2D) = "white" {}
         [NOScaleOffset] _DepthMap("DepthMap", 2D) = "white" {}
-        
+
         [Space(10)]
         _HairClip("HairClip", Range(0.0, 1.0)) = 0.5
         _Specular("Specular", Range(0.0, 1.0)) = 0.5
@@ -24,18 +24,21 @@ Shader "czw/Character/Hair"
 
         Tags
         {
-            "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline" "UniversalMaterialType" = "Lit" "IgnoreProjector" = "True" "ShaderModel"="4.5"
+            "RenderType" = "Transparent" "Queue"="Transparent" "RenderPipeline" = "UniversalPipeline"
         }
 
         Pass
         {
-            Name "ForwardLit"
+            Name "DepthPeelingPass"
             Tags
             {
-                "LightMode" = "UniversalForward"
+                "LightMode" = "DepthPeelingPass"
             }
-
-            Cull off
+            
+       
+            ZWrite On
+            ZTest LEqual
+            Cull Off
 
             HLSLPROGRAM
             #pragma target 4.5
@@ -48,7 +51,8 @@ Shader "czw/Character/Hair"
             #pragma multi_compile_fragment _ _SHADOWS_SOFT
 
             #pragma vertex LitPassVertex
-            #pragma fragment LitPassFragment
+            // #pragma fragment LitPassFragment
+            #pragma fragment DepthPeelingFragment
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"

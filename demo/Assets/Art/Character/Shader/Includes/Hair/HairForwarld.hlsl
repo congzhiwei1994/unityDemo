@@ -3,6 +3,11 @@
 
 #include "Assets/Art/Character/Shader/Includes/Hair//HairLighting.hlsl"
 
+struct DepthPeelingOutput
+{
+    float4 color :SV_TARGET0;
+    float4 depth :SV_TARGET1;
+};
 
 struct Attributes
 {
@@ -56,7 +61,7 @@ Varyings LitPassVertex(Attributes input)
 }
 
 
-half4 LitPassFragment(Varyings input) : SV_Target
+half4 HairShadingColor(Varyings input)
 {
     half4 baseMap = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.uv);
     half alpha = SAMPLE_TEXTURE2D(_OpacityMap, sampler_OpacityMap, input.uv);
@@ -69,9 +74,9 @@ half4 LitPassFragment(Varyings input) : SV_Target
     float3 normalWS = TransformTangentToWorld(noise, tbn);
 
     half depth = SAMPLE_TEXTURE2D(_DepthMap, sampler_DepthMap, input.uv).r;
-    
+
     HairData hair_data;
-    hair_data.diffuse =  baseMap.rgb;
+    hair_data.diffuse = baseMap.rgb;
     hair_data.specular = half3(_Specular, _Specular, _Specular);
     hair_data.roughness = _Roughness;
     hair_data.scatter = _Scatter;
@@ -83,9 +88,40 @@ half4 LitPassFragment(Varyings input) : SV_Target
 
     half3 color = HairLighting(hair_data);
     clip(alpha - _HairClip);
-    color = clamp(0,1.6,color);
-    return half4(color, 1);
+    color = clamp(0, 1.6, color);
+    return half4(color, alpha);
 }
 
 
+DepthPeelingOutput DepthPeelingFragment(Varyings input)
+{
+    DepthPeelingOutput output;
+    
+    output.color = HairShadingColor(input);
+    output.depth = input.positionCS.z;
+
+    // 第一次循环，直接画颜色与深度
+    UNITY_BRANCH if (_DepthPeelingPassCount == 0)
+    {
+        return output;
+    }
+
+    float2 screenUV = input.positionCS.xy / _ScreenParams.xy;
+    float depthTex = SAMPLE_TEXTURE2D(_MaxDepthTex, sampler_MaxDepthTex, screenUV).r;
+
+    //如果当前相机离相机更近，那么丢弃该像素,只渲染距离摄像机远的像素
+    #if UNITY_REVERSED_Z
+    if (input.positionCS.z >= depthTex)
+    {
+        discard;
+    }
+    #else
+    if (input.positionCS.z <= depthTex)
+    {
+        discard;
+    }
+    #endif
+
+    return output;
+}
 #endif
