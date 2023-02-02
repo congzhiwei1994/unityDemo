@@ -157,6 +157,7 @@ Material:
     - _Glossiness: 0.442
     - _GlossyReflections: 1
     - _HairClip: 0.027
+    - _HairShadowClip: 0.171
     - _HairShiftTexScale: 10
     - _Marschner1Intensity: 0.8
     - _Marschner1Smoothness: 0.8

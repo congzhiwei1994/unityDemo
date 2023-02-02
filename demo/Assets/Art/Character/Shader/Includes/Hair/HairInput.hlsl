@@ -1,6 +1,13 @@
 #ifndef HAIR_INPUT_INCLUDE
 #define HAIR_INPUT_INCLUDE
 
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
+
 #define _NORMALMAP
 
 CBUFFER_START(UnityPerMaterial)
@@ -11,6 +18,7 @@ half _Roughness;
 half _Specular;
 half _Scatter;
 half _NoiseIntensity;
+half _HairShadowClip;
 CBUFFER_END
 
 // -------------------------------------------
