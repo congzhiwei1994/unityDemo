@@ -5,3 +5,9 @@
 /demo/Temp
 /demo/Logs
 /demo/obj
+/Logs
+/Packages
+/Temp
+/Library
+/*.csproj
+/*.sln
