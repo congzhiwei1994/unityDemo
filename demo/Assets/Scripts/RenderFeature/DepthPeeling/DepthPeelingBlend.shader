@@ -51,9 +51,7 @@ Shader "czw/Character/Hair/DepthPeelingBlend"
         half4 frag(Varyings i) : SV_Target
         {
             float2 uv = i.positionCS.xy / _ScreenParams.xy;
-            // uv = i.uv;
             half4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
-            // 场景不透明的深度
             float sceneDepth = SAMPLE_TEXTURE2D(_CameraDepthTexture, sampler_CameraDepthTexture, uv);
             // 头发的深度
             float blendDepth = SAMPLE_TEXTURE2D(_DepthTex, sampler_DepthTex, uv);
@@ -71,13 +69,14 @@ Shader "czw/Character/Hair/DepthPeelingBlend"
             }
             #endif
 
-            #if UNITY_REVERSED_Z
-            UNITY_BRANCH if (blendDepth = 0)
+            // 剔除背景
+            #ifdef  UNITY_REVERSED_Z
+            UNITY_BRANCH if (blendDepth == 0)
             {
                 discard;
             }
             #else
-            UNITY_BRANCH if (blendDepth = 1)
+            UNITY_BRANCH if (blendDepth == 1)
             {
                 discard;
             }

@@ -19,7 +19,6 @@ namespace czw.DepthPeeling
         private static int ID_DepthPeelingPassCount;
 
         private string shaderName = "czw/Character/Hair/DepthPeelingBlend";
-        // private string shaderName = " Hidden/DepthPeelingBlend";
 
         private string blendDepthTexName = "_DepthTex";
         private string maxDepthTexName = "_MaxDepthTex";
@@ -53,14 +52,23 @@ namespace czw.DepthPeeling
             profilingSampler = new ProfilingSampler(passTag + setting.renderQueueType);
 
             ID_DepthPeelingPassCount = Shader.PropertyToID(passCountName);
-            
-            colorRTs = new List<int>(setting.passNumber);
-            depthRTs = new List<int>(setting.passNumber);
         }
 
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
+            var volumeStake = VolumeManager.instance.stack;
+            var volume = volumeStake.GetComponent<DepthPeelingVolume>();
+
+            if (volume == null)
+            {
+                return;
+            }
+
+            var passCount = volume.Params.value.passCount;
+            colorRTs = new List<int>(passCount);
+            depthRTs = new List<int>(passCount);
+
             var drawingSettings = CreateDrawingSettings(shaderTag, ref renderingData, setting.sortingCriteria);
 
             var width = renderingData.cameraData.camera.pixelWidth;
@@ -72,8 +80,8 @@ namespace czw.DepthPeeling
                 context.ExecuteCommandBuffer(cmd);
                 cmd.Clear();
 
-               
-                for (int i = 0; i < setting.passNumber; i++)
+
+                for (int i = 0; i < passCount; i++)
                 {
                     colorRTs.Add(Shader.PropertyToID($"_DepthPeelingColor{i}"));
                     depthRTs.Add(Shader.PropertyToID($"_DepthPeelingDepth{i}"));
@@ -101,16 +109,17 @@ namespace czw.DepthPeeling
 
                 cmd.SetRenderTarget(source, renderer.cameraDepthTarget);
                 // cmd.SetRenderTarget(BuiltinRenderTextureType.CameraTarget, BuiltinRenderTextureType.CameraTarget);
+
                 // -------------------------------------------------------
                 // 从后往前进行半透明颜色混合
-                for (int i = setting.passNumber - 1; i >= 0; i--)
+                for (int i = passCount - 1; i >= 0; i--)
                 {
                     var dest = renderingData.cameraData.renderer.cameraColorTarget;
 
                     cmd.SetGlobalTexture(blendDepthTexName, depthRTs[i]);
                     int pass = 0;
                     // 第一次混合时，与黑色混合
-                    if (i == setting.passNumber - 1)
+                    if (i == passCount - 1)
                     {
                         pass = 1;
                     }

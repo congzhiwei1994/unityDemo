@@ -176,14 +176,14 @@ Material:
     - _Roughness0: 0.35
     - _Roughness1: 0.25
     - _RoughnessMix: 0.85
-    - _Scatter: 0.603
+    - _Scatter: 0.777
     - _Second_AnisotropicPowerScale: 1
     - _Second_AnisotropicPowerValue: 1
     - _Second_ShiftTangent: 0.5
     - _ShadowIntensity: 0.775
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
-    - _Specular: 0.306
+    - _Specular: 0.386
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0

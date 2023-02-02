@@ -13,8 +13,8 @@ namespace czw.DepthPeeling
         [System.Serializable]
         public class Setting
         {
-            public RenderPassEvent _event = RenderPassEvent.AfterRenderingOpaques;
-            [Range(0, 10)] public int passNumber = 5;
+            public RenderPassEvent _event = RenderPassEvent.AfterRenderingTransparents;
+            // [Range(0, 10)] public int passNumber = 5;
             public RenderQueueType renderQueueType = RenderQueueType.Transparent;
             public SortingCriteria sortingCriteria = SortingCriteria.CommonOpaque;
         }
