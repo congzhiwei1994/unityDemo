@@ -1,4 +1,4 @@
-Shader "czw/Character/Hair/DepthPeelingBlend"
+Shader "czw/RenderFeature/DepthPeelingBlend"
 {
     Properties
     {

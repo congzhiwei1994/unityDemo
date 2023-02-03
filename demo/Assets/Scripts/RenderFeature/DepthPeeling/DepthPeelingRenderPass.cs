@@ -18,7 +18,7 @@ namespace czw.DepthPeeling
 
         private static int ID_DepthPeelingPassCount;
 
-        private string shaderName = "czw/Character/Hair/DepthPeelingBlend";
+        private string shaderName = "czw/RenderFeature/DepthPeelingBlend";
 
         private string blendDepthTexName = "_DepthTex";
         private string maxDepthTexName = "_MaxDepthTex";

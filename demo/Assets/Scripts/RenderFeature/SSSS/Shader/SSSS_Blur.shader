@@ -1,4 +1,4 @@
-Shader "czw/Character/Skin/SSSS_Blur"
+Shader "czw/RenderFeature/Skin/SSSS_Blur"
 {
     Properties
     {
