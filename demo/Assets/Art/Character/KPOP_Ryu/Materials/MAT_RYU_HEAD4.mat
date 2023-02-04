@@ -50,7 +50,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _DetailBumpMap:
         m_Texture: {fileID: 2800000, guid: e06b5b48b51cdf24bae25a152bf4a7f5, type: 3}
-        m_Scale: {x: 10, y: 10}
+        m_Scale: {x: 15, y: 15}
         m_Offset: {x: 0, y: 0}
     - _DetailMap:
         m_Texture: {fileID: 0}
@@ -127,7 +127,7 @@ Material:
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapInteisty: 1
     - _DetailNormalMapScale: 1
-    - _DetailScale: 0.246
+    - _DetailScale: 0.24
     - _DstBlend: 0
     - _EnableBaseMapEyeMask: 0
     - _EnableBeckman: 0
@@ -151,7 +151,7 @@ Material:
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecIntensityEye: 1
-    - _Specular: 0.087
+    - _Specular: 0.044
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
