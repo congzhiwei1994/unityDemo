@@ -45,6 +45,19 @@ Shader "czw/RenderFeature/SSAO"
             half4 _BaseColor;
             float4 _BaseMap_ST;
             CBUFFER_END
+
+            // Params
+            half4 _SSAOParams;
+            half4 _CameraViewTopLeftCorner[2];
+            half4x4 _CameraViewProjections[2];
+            // This is different from UNITY_MATRIX_VP (platform-agnostic projection matrix is used). Handle both non-XR and XR modes.
+            float4 _SourceSize;
+            float4 _ProjectionParams2;
+            float4 _CameraViewXExtent[2];
+            float4 _CameraViewYExtent[2];
+            float4 _CameraViewZExtent[2];
+
+
             TEXTURE2D(_BaseMap);
             SAMPLER(sampler_BaseMap);
             // #define smp _linear_clampU_mirrorV
@@ -73,7 +86,7 @@ Shader "czw/RenderFeature/SSAO"
         }
 
 
-      Pass
+        Pass
         {
             Name "DepthOnly"
             Tags

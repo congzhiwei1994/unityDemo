@@ -44,7 +44,7 @@ namespace czw.SSAO
 
             public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
             {
-                pass.renderPassEvent = setting.passEvent;
+                // pass.renderPassEvent = setting.passEvent;
                 pass.Setup(renderer, materal);
                 renderer.EnqueuePass(pass);
             }
