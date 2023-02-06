@@ -26,20 +26,14 @@ namespace czw.FlowMapTool
             SceneView.duringSceneGui += SceneViewEvent;
         }
 
-        private void SceneViewEvent(SceneView sceneView)
-        {
-            if (!isDrawFlowMap)
-                return;
-
-            editorSetting.Init(Event.current, flowMap, this);
-            editorSetting.DrawSetting();
-        }
 
         public override void OnInspectorGUI()
         {
             flowMap = (FlowMap)target;
             if (!flowMap.enabled && !flowMap.gameObject.activeSelf)
+            {
                 return;
+            }
 
             SetSceneViewState();
             DrawGUI();
@@ -52,8 +46,7 @@ namespace czw.FlowMapTool
                 return;
 
             EditorGUILayout.HelpBox(EditorDescription.FlowingEditorUsage, MessageType.Info);
-
-            // 位置
+            
             var posOld = FlowMapViewUtils.Vector3GUI("FlowMap Area Position", areaPos);
             if (posOld != areaPos)
             {
@@ -94,6 +87,14 @@ namespace czw.FlowMapTool
             EditorGUILayout.EndHorizontal();
         }
 
+        private void SceneViewEvent(SceneView sceneView)
+        {
+            if (!isDrawFlowMap)
+                return;
+
+            editorSetting.Init(Event.current, flowMap, this);
+            editorSetting.DrawSetting();
+        }
 
         private void SetSceneViewState()
         {

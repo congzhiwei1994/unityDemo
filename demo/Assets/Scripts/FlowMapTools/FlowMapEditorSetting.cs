@@ -31,6 +31,7 @@ namespace czw.FlowMapTool
             var controlId = GUIUtility.GetControlID(FocusType.Passive);
             HandleUtility.AddDefaultControl(controlId);
 
+            // 滚轮移动
             if (e.type == EventType.ScrollWheel)
                 e.Use();
 
@@ -124,5 +125,7 @@ namespace czw.FlowMapTool
         public static void Clear()
         {
         }
+        
+        
     }
 }
