@@ -83,7 +83,6 @@ namespace czw.SSAO
 
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
-            RenderTextureDescriptor cameraTargetDescriptor = renderingData.cameraData.cameraTargetDescriptor;
             Vector4 ssaoParams = new Vector4(
                 setting.Intensity,
                 setting.Radius,
@@ -117,14 +116,37 @@ namespace czw.SSAO
             m_CameraZExtent = farCentre;
 
             // 把参数设置进材质
+            SetMaterials(renderingData.cameraData.camera.nearClipPlane);
+            GetDescriptor(renderingData.cameraData.cameraTargetDescriptor);
+
+            // 为了效果好, 这里RT的用FilterMode用Bilinear.
+            cmd.GetTemporaryRT(SSAOData.s_SSAOTexture1ID, m_AOPassDescriptor, FilterMode.Bilinear);
+            cmd.GetTemporaryRT(SSAOData.s_SSAOTexture2ID, m_BlurPassesDescriptor, FilterMode.Bilinear);
+            cmd.GetTemporaryRT(SSAOData.s_SSAOTexture3ID, m_BlurPassesDescriptor, FilterMode.Bilinear);
+            cmd.GetTemporaryRT(SSAOData.s_SSAOTextureFinalID, m_FinalDescriptor, FilterMode.Bilinear);
+
+            // 画布的输入，如果是AfterOpaque, 就画在Color RT上类似于贴上去, 否则就创建一个RT, 物体着色的时候进行采样, 让其变暗.
+            // Configure targets and clear color
+            ConfigureTarget(setting.passEvent == RenderPassEvent.AfterRenderingOpaques
+                ? renderer.cameraColorTarget
+                : SSAOData.s_SSAOTexture2ID);
+            ConfigureClear(ClearFlag.None, Color.white);
+        }
+
+        private void SetMaterials(float nearClipPlane)
+        {
+            // 把参数设置进材质
             material.SetVector(SSAOData.s_ProjectionParams2ID,
-                new Vector4(1.0f / renderingData.cameraData.camera.nearClipPlane, 0.0f, 0.0f, 0.0f));
+                new Vector4(1.0f / nearClipPlane, 0.0f, 0.0f, 0.0f));
             material.SetMatrix(SSAOData.s_CameraViewProjectionsID, m_CameraViewProjections);
             material.SetVector(SSAOData.s_CameraViewTopLeftCornerID, m_CameraTopLeftCorner);
             material.SetVector(SSAOData.s_CameraViewXExtentID, m_CameraXExtent);
             material.SetVector(SSAOData.s_CameraViewYExtentID, m_CameraYExtent);
             material.SetVector(SSAOData.s_CameraViewZExtentID, m_CameraZExtent);
+        }
 
+        private void GetDescriptor(RenderTextureDescriptor cameraTargetDescriptor)
+        {
             // Set up the descriptors
             RenderTextureDescriptor descriptor = cameraTargetDescriptor;
             descriptor.msaaSamples = 1;
@@ -144,20 +166,8 @@ namespace czw.SSAO
             // AO的结果图是一个0~1的黑白图, 所以单通道的R8就可以了. 不过可能存在一些设备不支持, 就用ARGB32.
             m_FinalDescriptor.colorFormat =
                 m_SupportsR8RenderTextureFormat ? RenderTextureFormat.R8 : RenderTextureFormat.ARGB32;
-
-            // 为了效果好, 这里RT的用FilterMode用Bilinear.
-            cmd.GetTemporaryRT(SSAOData.s_SSAOTexture1ID, m_AOPassDescriptor, FilterMode.Bilinear);
-            cmd.GetTemporaryRT(SSAOData.s_SSAOTexture2ID, m_BlurPassesDescriptor, FilterMode.Bilinear);
-            cmd.GetTemporaryRT(SSAOData.s_SSAOTexture3ID, m_BlurPassesDescriptor, FilterMode.Bilinear);
-            cmd.GetTemporaryRT(SSAOData.s_SSAOTextureFinalID, m_FinalDescriptor, FilterMode.Bilinear);
-
-            // 画布的输入，如果是AfterOpaque, 就画在Color RT上类似于贴上去, 否则就创建一个RT, 物体着色的时候进行采样, 让其变暗.
-            // Configure targets and clear color
-            ConfigureTarget(setting.passEvent == RenderPassEvent.AfterRenderingOpaques
-                ? renderer.cameraColorTarget
-                : SSAOData.s_SSAOTexture2ID);
-            ConfigureClear(ClearFlag.None, Color.white);
         }
+
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
@@ -168,7 +178,6 @@ namespace czw.SSAO
                     GetType().Name);
                 return;
             }
-
 
             CommandBuffer cmd = CommandBufferPool.Get("SSAO");
             using (new ProfilingScope(cmd, m_ProfilingSampler))
@@ -189,6 +198,10 @@ namespace czw.SSAO
 
         public override void OnCameraCleanup(CommandBuffer cmd)
         {
+            cmd.ReleaseTemporaryRT(SSAOData.s_SSAOTexture1ID);
+            cmd.ReleaseTemporaryRT(SSAOData.s_SSAOTexture2ID);
+            cmd.ReleaseTemporaryRT(SSAOData.s_SSAOTexture3ID);
+            cmd.ReleaseTemporaryRT(SSAOData.s_SSAOTextureFinalID);
         }
 
         // 设置RT, 全屏绘制某个pass. 因为是全部覆盖的后处理绘制,
