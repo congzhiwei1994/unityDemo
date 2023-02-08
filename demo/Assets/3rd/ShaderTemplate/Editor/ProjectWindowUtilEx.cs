@@ -32,6 +32,13 @@ public class ProjectWindowUtilEx
         string path = Application.dataPath + "/3rd/ShaderTemplate/Editor/Template/Unlit.shader";
         ProjectWindowUtilEx.CreateScriptUtil(path, "New UnlitShader.shader");
     }
+    
+    [MenuItem("Assets/Create/Shader/URP/UnlitMultiPass")]
+    static void CreateUrpMulUnlitShader()
+    {
+        string path = Application.dataPath + "/3rd/ShaderTemplate/Editor/Template/Unlit_MultiPass.shader";
+        ProjectWindowUtilEx.CreateScriptUtil(path, "New UnlitMultiPass.shader");
+    }
 
     public static void CreateScriptUtil(string path, string templete)
     {
