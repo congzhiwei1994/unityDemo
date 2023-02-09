@@ -8,12 +8,12 @@ using UnityEditor;
 namespace czw.FlowMapTool
 {
     [System.Serializable]
-    [CustomEditor(typeof(FlowMap))]
+    [CustomEditor(typeof(FlowMapMono))]
     public class FlowMapEditor : Editor
     {
-        private FlowMap flowMapMono;
+        private FlowMapMono mono;
         private Event _event;
-        private FlowMapEditorSetting editorSetting;
+        private FlowMapSetting setting;
         private bool isDrawFlowMap = false;
 
         private FlowMapResolution _resolution = FlowMapResolution._1024;
@@ -22,55 +22,67 @@ namespace czw.FlowMapTool
         private float flowSpeed = 0.5f;
         private float brushStrength = 0.3f;
         public Texture flowMapTex;
-        private WaterSetting waterSetting;
+        private FlowData data;
 
-        private bool isInit;
+        private bool isDataInit;
+        private Material waterMat;
 
         private void OnEnable()
         {
-            isInit = false;
-
-            flowMapMono = (FlowMap)target;
-            editorSetting = new FlowMapEditorSetting();
+            mono = (FlowMapMono)target;
+            isDataInit = false;
             Init();
-
-            SceneView.duringSceneGui += SceneViewEvent;
         }
 
         private void Init()
         {
-            Debug.LogError("FlowMapEditor------Init()");
+            GetWaterMaterial();
+            mono.GetMateral(waterMat);
+            setting = new FlowMapSetting(mono);
 
-            if (waterSetting == null)
-            {
-                var getWaterSetting = flowMapMono.gameObject.GetComponent<WaterSetting>();
-                if (getWaterSetting == null)
-                {
-                    getWaterSetting = flowMapMono.gameObject.AddComponent<WaterSetting>();
-                }
-
-                waterSetting = getWaterSetting;
-            }
-
-            _resolution = waterSetting.resolution;
-            areaPos = waterSetting.areaPos;
-            areaSize = waterSetting.areaSize;
-            flowSpeed = waterSetting.flowSpeed;
-            brushStrength = waterSetting.brushStrength;
-            flowMapTex = waterSetting.flowMapTex;
-
-            isInit = true;
+            InitFlowData();
+            SceneView.duringSceneGui += SceneViewEvent;
         }
 
+        private void InitFlowData()
+        {
+            if (data == null)
+            {
+                var getData = mono.gameObject.GetComponent<FlowData>();
+                if (getData == null)
+                {
+                    getData = mono.gameObject.AddComponent<FlowData>();
+                }
+
+                data = getData;
+            }
+
+            _resolution = data.resolution;
+            areaPos = data.areaPos;
+            areaSize = data.areaSize;
+            flowSpeed = data.flowSpeed;
+            brushStrength = data.brushStrength;
+            flowMapTex = data.flowMapTex;
+
+            isDataInit = true;
+        }
+
+        private void GetWaterMaterial()
+        {
+            if (waterMat == null)
+            {
+                waterMat = mono.gameObject.GetComponent<Renderer>().sharedMaterial;
+            }
+        }
 
         public override void OnInspectorGUI()
         {
-            if (!flowMapMono.enabled && !flowMapMono.gameObject.activeSelf)
+            if (!mono.enabled && !mono.gameObject.activeSelf)
             {
                 return;
             }
 
-            editorSetting.SetSceneViewState();
+            setting.SetSceneViewState();
             OnDrawGUI();
         }
 
@@ -79,17 +91,17 @@ namespace czw.FlowMapTool
             isDrawFlowMap = GUILayout.Toggle(isDrawFlowMap, "Flowmap Painter", "Button");
             if (!isDrawFlowMap)
             {
-                isInit = false;
+                isDataInit = false;
                 return;
             }
-               
+
             /*          else
                       {
                           SceneView.lastActiveSceneView.LookAt(flowMap.areaPos);
                       }
           */
 
-            if (!isInit)
+            if (!isDataInit)
             {
                 Init();
             }
@@ -102,40 +114,40 @@ namespace czw.FlowMapTool
             if (posOld != areaPos)
             {
                 areaPos = posOld;
-                flowMapMono.areaPos = areaPos;
+                mono.areaPos = areaPos;
             }
 
             var sizeOld = FlowMapViewUtils.IntSliderGUI("Flow Area Size", areaSize, 10, 2000);
             if (sizeOld != areaSize)
             {
                 areaSize = sizeOld;
-                flowMapMono.areaSize = areaSize;
+                mono.areaSize = areaSize;
             }
 
             var flowSpeedOld = FlowMapViewUtils.SliderGUI("Flow Speed", flowSpeed, 0, 1);
             if (flowSpeedOld != flowSpeed)
             {
                 flowSpeed = flowSpeedOld;
-                flowMapMono.flowSpeed = flowSpeed;
+                mono.flowSpeed = flowSpeed;
             }
 
             if (EditorGUI.EndChangeCheck())
             {
-                flowMapMono.areaSize = areaSize;
+                mono.areaSize = areaSize;
             }
 
             var brushStrengthOld = FlowMapViewUtils.SliderGUI("Brush Strength", brushStrength, 0, 1);
             if (brushStrength != brushStrengthOld)
             {
                 brushStrength = brushStrengthOld;
-                flowMapMono.brushStrength = brushStrength;
+                mono.brushStrength = brushStrength;
             }
 
             var _resolutionOld = (FlowMapResolution)FlowMapViewUtils.EnumPopupGUI("Flow Map resolution", _resolution);
             if (_resolutionOld != _resolution)
             {
                 _resolution = _resolutionOld;
-                flowMapMono.resolution = _resolution;
+                mono.resolution = _resolution;
             }
 
 
@@ -143,28 +155,26 @@ namespace czw.FlowMapTool
             {
                 if (GUILayout.Button("Load Last Save"))
                 {
-                    // if (EditorUtility.DisplayDialog("提示：", "是否加载上一次保存的纹理?", "Yes", "No"))
-                    // {
-                    //   
-                    // }
-                    //
+                    /*        if (EditorUtility.DisplayDialog("提示：", "是否加载上一次保存的纹理?", "Yes", "No"))
+                            {
+                            }
+        */
                     Init();
                 }
 
                 if (GUILayout.Button("Save"))
                 {
-                    flowMapMono.Save(waterSetting);
+                    mono.Save(data);
                 }
 
                 if (GUILayout.Button("Clear"))
                 {
-                    editorSetting.Clear();
                 }
             }
             EditorGUILayout.EndHorizontal();
         }
 
-        
+
         private void SceneViewEvent(SceneView sceneView)
         {
             if (!isDrawFlowMap)
@@ -173,7 +183,7 @@ namespace czw.FlowMapTool
             var controlId = GUIUtility.GetControlID(FocusType.Passive);
             HandleUtility.AddDefaultControl(controlId);
 
-            editorSetting.Setup(Event.current, flowMapMono, this, controlId);
+            setting.Setup(Event.current, mono, this, controlId);
         }
 
         private void OnDisable()

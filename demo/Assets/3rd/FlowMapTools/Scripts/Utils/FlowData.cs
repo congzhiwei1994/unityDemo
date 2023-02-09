@@ -3,9 +3,8 @@ using UnityEngine;
 
 namespace czw.FlowMapTool
 {
-    [ExecuteAlways]
     [Serializable]
-    public class WaterSetting : MonoBehaviour
+    public class FlowData : MonoBehaviour
     {
         public FlowMapResolution resolution = FlowMapResolution._1024;
         public int areaSize = 200;

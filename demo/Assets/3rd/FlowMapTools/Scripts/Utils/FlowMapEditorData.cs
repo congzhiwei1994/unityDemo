@@ -2,7 +2,7 @@
 
 namespace czw.FlowMapTool
 {
-    public class FlowMapData : MonoBehaviour
+    public class FlowMapEditorData : MonoBehaviour
     {
         /// <summary>
         /// Water Shader Texture Name

@@ -27,7 +27,7 @@ namespace czw.FlowMapTool
             return descriptor;
         }
 
-        public static RenderTexture GetRenderTexture(int width, int height)
+        public static RenderTexture InitRenderTexture(int width, int height)
         {
             GetRenderTextureDescriptor(width, height);
             var rt = RenderTexture.GetTemporary(descriptor);

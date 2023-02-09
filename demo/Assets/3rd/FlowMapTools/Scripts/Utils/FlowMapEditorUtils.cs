@@ -69,7 +69,7 @@ namespace czw.FlowMapTool
         public static void Draw(Vector3 pos, Vector3 dir, float radius, float strength, Material material,
             bool eraseMode = false)
         {
-            FlowMapRenderSetting.GetRenderTexture(1024, 1024);
+            FlowMapRenderSetting.InitRenderTexture(1024, 1024);
         }
     }
 }
