@@ -5,14 +5,16 @@ using Color = UnityEngine.Color;
 
 namespace czw.FlowMapTool
 {
-    public class FlowMapEditorUtils
+    public static class FlowMapUtils
     {
-        const int MaxHeight = 1080;
-
-        public static Vector2Int GetScreenSizeLimited()
+        /// <summary>
+        /// 获取水的材质
+        /// </summary>
+        public static Material GetWaterMaterial(FlowMapMono mono)
         {
-            return new Vector2Int(1, 1);
+            return mono.gameObject.GetComponent<Renderer>().sharedMaterial;
         }
+
 
         /// <summary>
         ///  获取射线相交点
@@ -34,14 +36,13 @@ namespace czw.FlowMapTool
         }
 
 
-
         public static void CreatBrushHandle(int controlId, Vector3 pos, float radius, Event e)
         {
             if (e.control)
                 Handles.color = new Color(1, 1, 0);
             else
                 Handles.color = new Color(0, 0.8f, 1);
-            
+
             // 绘制外边框
             Handles.CircleHandleCap(controlId, (Vector3)pos, Quaternion.LookRotation(Vector3.up),
                 radius, EventType.Repaint);
@@ -66,10 +67,37 @@ namespace czw.FlowMapTool
         }
 
 
-        public static void Draw(Vector3 pos, Vector3 dir, float radius, float strength, Material material,
-            bool eraseMode = false)
+        public static float SetBrush(Event e, int areaSize, float radius)
         {
-            FlowMapRenderSetting.InitRenderTexture(1024, 1024);
+            if (e.type == EventType.ScrollWheel)
+                radius = FlowMapUtils.SetBrushRadius(e, areaSize, radius);
+
+            // 滚轮移动
+            if (e.type == EventType.ScrollWheel)
+                e.Use();
+
+            return radius;
+        }
+
+        /// <summary>
+        /// 设置笔刷半径
+        /// </summary>
+        public static float SetBrushRadius(Event e, int areaSize, float radius)
+        {
+            radius -= (e.delta.y * radius) / 40;
+            radius = Mathf.Clamp(radius, 0.1f, areaSize);
+            return radius;
+        }
+
+        public static void SetSceneViewState()
+        {
+            var lastScene = SceneView.lastActiveSceneView;
+            if (lastScene != null)
+            {
+                lastScene.sceneViewState.alwaysRefresh = true;
+                lastScene.sceneViewState.showSkybox = true;
+                lastScene.sceneViewState.showImageEffects = true;
+            }
         }
     }
 }

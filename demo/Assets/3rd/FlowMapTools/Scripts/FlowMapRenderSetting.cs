@@ -4,17 +4,17 @@ using UnityEngine.Rendering;
 
 namespace czw.FlowMapTool
 {
-    public class FlowMapRenderSetting
+    public class FlowMapRenderSetting : MonoBehaviour
     {
-        private static GraphicsFormat format = GraphicsFormat.R16G16B16A16_SFloat;
-        private static ClearFlag clearFlag = ClearFlag.Color;
-        private static Color clearColor = new Color(0.5f, 0.5f, 0.5f, 0.5f);
-        private const string FLOWMAP_NAME = "_flowmapRT";
-        private static RenderTextureDescriptor descriptor;
+        private GraphicsFormat format = GraphicsFormat.R16G16B16A16_SFloat;
+        private ClearFlag clearFlag = ClearFlag.Color;
+        private Color clearColor = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+        private string FLOWMAP_NAME = "_flowmapRT";
+        private RenderTextureDescriptor descriptor;
 
-        public static RenderTextureDescriptor GetRenderTextureDescriptor(int width, int height)
+        public RenderTextureDescriptor GetRenderTextureDescriptor(int width, int height)
         {
-            descriptor = new RenderTextureDescriptor(width, height, format, 0);
+            var descriptor = new RenderTextureDescriptor(width, height, format, 0);
             descriptor.sRGB = false;
             descriptor.enableRandomWrite = false;
             descriptor.dimension = TextureDimension.Tex2D;
@@ -24,45 +24,32 @@ namespace czw.FlowMapTool
             descriptor.mipCount = 0;
             descriptor.msaaSamples = 1;
             descriptor.vrUsage = VRTextureUsage.None;
+            descriptor.stencilFormat = GraphicsFormat.None;
             return descriptor;
         }
 
-        public static RenderTexture InitRenderTexture(int width, int height)
+        public RenderTexture GetRenderTexture(RenderTextureDescriptor descriptor)
         {
-            GetRenderTextureDescriptor(width, height);
-            var rt = RenderTexture.GetTemporary(descriptor);
-            rt.name = FLOWMAP_NAME;
+            var renderTexture = RenderTexture.GetTemporary(descriptor);
+            renderTexture.graphicsFormat = format;
+            renderTexture.stencilFormat = GraphicsFormat.None;
 
-            if (!IsRTCreat(rt))
-                rt.Create();
-            CleatRenderTexture(rt);
-            return rt;
+            renderTexture.name = FLOWMAP_NAME;
+            if (!renderTexture.IsCreated())
+            {
+                renderTexture.Create();
+            }
+
+            return renderTexture;
         }
 
-        private static void CleatRenderTexture(RenderTexture renderTexture)
+        public void ClearRenderTexture(RenderTexture renderTexture)
         {
             var activeRT = RenderTexture.active;
             RenderTexture.active = renderTexture;
             GL.Clear((clearFlag & ClearFlag.Depth) != 0, (clearFlag & ClearFlag.Color) != 0, clearColor);
             RenderTexture.active = activeRT;
         }
-
-        private static bool IsRTCreat(RenderTexture rt)
-        {
-            return rt.IsCreated();
-        }
-
-        public static void DrawFlowmapPass(int pass, Material material, RenderTexture source)
-        {
-            var tempRT = RenderTexture.GetTemporary(descriptor);
-            tempRT.name = "_TempRT";
-            var activeRT = RenderTexture.active;
-
-            Graphics.Blit(source, tempRT, material, pass);
-            Graphics.Blit(tempRT, source);
-
-            RenderTexture.active = activeRT;
-            tempRT.Release();
-        }
+        
     }
 }

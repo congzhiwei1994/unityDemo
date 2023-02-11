@@ -13,7 +13,7 @@ namespace czw.FlowMapTool
     {
         private FlowMapMono mono;
         private Event _event;
-        private FlowMapSetting setting;
+        private FlowMapDrawSetting _drawSetting;
         private bool isDrawFlowMap = false;
 
         private FlowMapResolution _resolution = FlowMapResolution._1024;
@@ -36,43 +36,28 @@ namespace czw.FlowMapTool
 
         private void Init()
         {
-            GetWaterMaterial();
-            mono.GetMateral(waterMat);
-            setting = new FlowMapSetting(mono);
-
-            InitFlowData();
+            // 获取水的材质
+            if (waterMat == null)
+                waterMat = FlowMapUtils.GetWaterMaterial(mono);
+            // 把材质设到mono
+            mono.SetWaterMateral(waterMat);
+            // 初始化 FlowMapDrawSetting
+            _drawSetting = new FlowMapDrawSetting(mono);
+            // 加载数据
+            LoadFlowData();
             SceneView.duringSceneGui += SceneViewEvent;
         }
 
-        private void InitFlowData()
+        // SceneView 事件
+        private void SceneViewEvent(SceneView sceneView)
         {
-            if (data == null)
-            {
-                var getData = mono.gameObject.GetComponent<FlowData>();
-                if (getData == null)
-                {
-                    getData = mono.gameObject.AddComponent<FlowData>();
-                }
+            if (!isDrawFlowMap)
+                return;
 
-                data = getData;
-            }
+            var controlId = GUIUtility.GetControlID(FocusType.Passive);
+            HandleUtility.AddDefaultControl(controlId);
 
-            _resolution = data.resolution;
-            areaPos = data.areaPos;
-            areaSize = data.areaSize;
-            flowSpeed = data.flowSpeed;
-            brushStrength = data.brushStrength;
-            flowMapTex = data.flowMapTex;
-
-            isDataInit = true;
-        }
-
-        private void GetWaterMaterial()
-        {
-            if (waterMat == null)
-            {
-                waterMat = mono.gameObject.GetComponent<Renderer>().sharedMaterial;
-            }
+            _drawSetting.Setup(Event.current, this, controlId, waterMat);
         }
 
         public override void OnInspectorGUI()
@@ -82,7 +67,7 @@ namespace czw.FlowMapTool
                 return;
             }
 
-            setting.SetSceneViewState();
+            FlowMapUtils.SetSceneViewState();
             OnDrawGUI();
         }
 
@@ -106,7 +91,7 @@ namespace czw.FlowMapTool
                 Init();
             }
 
-            EditorGUILayout.HelpBox(EditorDescription.FlowingEditorUsage, MessageType.Info);
+            //   EditorGUILayout.HelpBox(EditorDescription.FlowingEditorUsage, MessageType.Info);
 
             EditorGUI.BeginChangeCheck();
 
@@ -175,20 +160,35 @@ namespace czw.FlowMapTool
         }
 
 
-        private void SceneViewEvent(SceneView sceneView)
-        {
-            if (!isDrawFlowMap)
-                return;
-
-            var controlId = GUIUtility.GetControlID(FocusType.Passive);
-            HandleUtility.AddDefaultControl(controlId);
-
-            setting.Setup(Event.current, mono, this, controlId);
-        }
-
         private void OnDisable()
         {
             SceneView.duringSceneGui -= SceneViewEvent;
         }
+
+
+        private void LoadFlowData()
+        {
+            if (data == null)
+            {
+                var getData = mono.gameObject.GetComponent<FlowData>();
+                if (getData == null)
+                {
+                    getData = mono.gameObject.AddComponent<FlowData>();
+                }
+
+                data = getData;
+            }
+
+            _resolution = data.resolution;
+            areaPos = data.areaPos;
+            areaSize = data.areaSize;
+            flowSpeed = data.flowSpeed;
+            brushStrength = data.brushStrength;
+            flowMapTex = data.flowMapTex;
+
+            isDataInit = true;
+        }
+
+
     }
 }

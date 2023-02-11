@@ -15,6 +15,7 @@ namespace czw.FlowMapTool
         _4096 = 4096,
     }
 
+    [DisallowMultipleComponent]
     [ExecuteAlways]
     [Serializable]
     public class FlowMapMono : MonoBehaviour
@@ -33,6 +34,9 @@ namespace czw.FlowMapTool
         public static readonly int flowMapOffset_Id = Shader.PropertyToID("_FlowMapOffset");
         public static readonly int flowMapSpeed_Id = Shader.PropertyToID("_FlowMapSpeed");
 
+        /// <summary>
+        /// 把数据存储到 FlowData
+        /// </summary>
         public void Save(FlowData flowData)
         {
             flowData.resolution = resolution;
@@ -43,6 +47,10 @@ namespace czw.FlowMapTool
             flowData.flowMapTex = flowMapTex;
         }
 
+        public void SetWaterMateral(Material material)
+        {
+            this.material = material;
+        }
 
         private void OnEnable()
         {
@@ -56,27 +64,21 @@ namespace czw.FlowMapTool
             UnsubscribeAfterCameraRendering();
         }
 
-        void OnBeforeCameraRendering(ScriptableRenderContext context, Camera camera)
+        private void OnBeforeCameraRendering(ScriptableRenderContext context, Camera camera)
         {
-            SetParams();
+            SetWaterParams();
         }
 
-        void OnAfterCameraRendering(ScriptableRenderContext context, Camera camera)
+        private void OnAfterCameraRendering(ScriptableRenderContext context, Camera camera)
         {
         }
 
-        public void GetMateral(Material material)
-        {
-            this.material = material;
-        }
 
-        private void SetParams()
+        private void SetWaterParams()
         {
             material.SetFloat(flowMapSize_Id, areaSize);
             material.SetVector(flowMapOffset_Id, areaPos);
             material.SetFloat(flowMapSpeed_Id, flowSpeed);
-
-            Debug.LogError("设置：areaSize,areaPos,flowSpeed--到材质-----" + "FlowMapMono");
         }
 
         #region 事件
