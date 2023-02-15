@@ -251,7 +251,6 @@ GameObject:
   - component: {fileID: 564149153}
   - component: {fileID: 564149152}
   - component: {fileID: 564149151}
-  - component: {fileID: 564149150}
   - component: {fileID: 564149149}
   m_Layer: 0
   m_Name: Plane
@@ -277,20 +276,10 @@ MonoBehaviour:
   areaSize: 200
   flowSpeed: 0
   brushStrength: 1
-  areaPos: {x: 0, y: 0, z: 0}
---- !u!114 &564149150
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 564149148}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2b1e186c8517734aa7690cd0c8168e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _flowMapTex2D: {fileID: 0}
+  areaPos: {x: -72, y: 0, z: -125}
+  bounds:
+    m_Center: {x: -72, y: 5, z: -125}
+    m_Extent: {x: 159.8947, y: 5, z: 159.89471}
 --- !u!114 &564149151
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -304,8 +293,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   texSize: 2048
-  areaSize: 100
-  areaPos: {x: 0, y: 0, z: 0}
+  areaSize: 319
+  areaPos: {x: -72, y: 0, z: -125}
   flowSpeed: 1
   brushStrength: 1
 --- !u!64 &564149152
@@ -380,8 +369,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 564149148}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 1, z: 10}
+  m_LocalPosition: {x: -72, y: 0, z: -125}
+  m_LocalScale: {x: 31.978941, y: 26.148272, z: 31.978941}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}

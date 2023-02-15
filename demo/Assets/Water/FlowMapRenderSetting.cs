@@ -8,33 +8,35 @@ namespace Water
     [DisallowMultipleComponent]
     public class FlowMapRenderSetting : MonoBehaviour
     {
-        public static readonly int KW_FlowMapTex = Shader.PropertyToID("_KW_FlowMapTex");
 
         public TemporaryRenderTexture _flowmapRT = new TemporaryRenderTexture();
         public Texture2D _flowMapTex2D;
-
-        private FlowMapData data;
-
         private FlowMapData flowData;
-        private Material _flowMaterial;
+        private FlowMapMono mono;
 
-        private Material FlowMaterial
+        private Material flowEditorMaterial;
+
+
+        public FlowMapRenderSetting(FlowMapMono mono, FlowMapData flowData)
         {
-            get
-            {
-                if (_flowMaterial == null)
-                    _flowMaterial = GetFlowMapEditorMaterial();
-                return _flowMaterial;
-            }
+            this.mono = mono;
+            this.flowData = flowData;
+
+            if (flowEditorMaterial == null)
+                flowEditorMaterial = FlowMapUtils.GetFlowMapEditorMaterial();
+            
         }
 
-        private Material GetFlowMapEditorMaterial()
+        public void Draw(Vector3 brushPos, Vector3 brushDir, float brushRadius,
+            float brushStrength, bool eraseMode = false)
         {
-            return CoreUtils.CreateEngineMaterial("czw/Tools/FlowMap/FlowMapEditor");
+            GetFlowMapRT((int)mono.texSize);
+            DrawOnFlowMap(brushPos, brushDir, brushRadius, brushStrength, flowData,
+                eraseMode, mono);
         }
 
 
-        public void InitializeFlowMapEditorResources(int texSize, FlowMapData flowData)
+        private void GetFlowMapRT(int texSize)
         {
             if (_flowmapRT.isInitialized && _flowmapRT.rt.width != texSize)
             {
@@ -59,15 +61,13 @@ namespace Water
                 // KW_Extensions.SafeDestroy(_flowMapTex2D);
             }
 
-            Shader.SetGlobalTexture(KW_FlowMapTex, _flowmapRT.rt);
+            Shader.SetGlobalTexture(FlowConstData.FLOW_MAP_ID, _flowmapRT.rt);
             flowData.flowTex = _flowmapRT.rt;
         }
 
         public void DrawOnFlowMap(Vector3 brushPosition, Vector3 brushMoveDirection, float circleRadius,
-            float brushStrength, FlowMapData flowData, bool eraseMode = false, FlowMapMono mono = null )
+            float brushStrength, FlowMapData flowData, bool eraseMode = false, FlowMapMono mono = null)
         {
-            // var brushSize = _currentFlowmapData.areaSize / circleRadius;
-            // var uv        = new Vector2(brushPosition.x / _currentFlowmapData.areaSize + 0.5f, brushPosition.z / _currentFlowmapData.areaSize + 0.5f);
             var boundsSize = flowData.bounds.size;
             float maxValue = 0;
             if (boundsSize.x > boundsSize.z)
@@ -78,26 +78,23 @@ namespace Water
             {
                 maxValue = boundsSize.z;
             }
-// Debug.LogError(maxValue);
-            // maxValue *= 0.1f;
-            // maxValue = boundsSize.z * boundsSize.x;
-            
+
             var areaSize = maxValue;
             var brushSize = areaSize / circleRadius;
             var uv = new Vector2(brushPosition.x / areaSize + 0.5f, brushPosition.z / areaSize + 0.5f);
             if (brushMoveDirection.magnitude < 0.001f)
                 brushMoveDirection = Vector3.zero;
 
-            FlowMaterial.SetVector("_MousePos", uv);
-            FlowMaterial.SetVector("_Direction", new Vector2(brushMoveDirection.x, brushMoveDirection.z));
-            FlowMaterial.SetFloat("_Size", brushSize * 0.75f);
-            FlowMaterial.SetFloat("_BrushStrength", brushStrength / (circleRadius * 3));
-            FlowMaterial.SetFloat("isErase", eraseMode ? 1 : 0);
+            flowEditorMaterial.SetVector("_MousePos", uv);
+            flowEditorMaterial.SetVector("_Direction", new Vector2(brushMoveDirection.x, brushMoveDirection.z));
+            flowEditorMaterial.SetFloat("_Size", brushSize * 0.75f);
+            flowEditorMaterial.SetFloat("_BrushStrength", brushStrength / (circleRadius * 3));
+            flowEditorMaterial.SetFloat("isErase", eraseMode ? 1 : 0);
 
             var tempRT = new TemporaryRenderTexture("_TempRT", _flowmapRT);
             var activeRT = RenderTexture.active;
 
-            Graphics.Blit(_flowmapRT.rt, tempRT.rt, FlowMaterial, 0);
+            Graphics.Blit(_flowmapRT.rt, tempRT.rt, flowEditorMaterial, 0);
             Graphics.Blit(tempRT.rt, _flowmapRT.rt);
             RenderTexture.active = activeRT;
             tempRT.Release();

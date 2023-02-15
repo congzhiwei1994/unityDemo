@@ -1,6 +1,8 @@
-﻿using czw.FlowMapTool;
+﻿using System.IO;
+using czw.FlowMapTool;
 using UnityEditor;
 using UnityEngine;
+using UnityEditor.SceneManagement;
 
 namespace Water.Editor
 {
@@ -19,39 +21,19 @@ namespace Water.Editor
         private float flowSpeed = 0.5f;
         private float brushStrength = 1;
         private FlowMapRenderSetting renderSetting;
+        private bool isInit = false;
+        private bool isGetPath = false;
+        private string flowMapPath;
 
         void OnEnable()
         {
             mono = (FlowMapMono)target;
-            Init();
+            flowData = FlowMapUtils.GetFlowMapData(mono);
+            renderSetting = new FlowMapRenderSetting(mono, flowData);
+            flowmapSetting = new FlowmapSetting(flowData, mono, renderSetting);
             SceneView.duringSceneGui += OnSceneGUIEvent;
         }
 
-        private void Init()
-        {
-            renderSetting = new FlowMapRenderSetting();
-
-            InitFlowData();
-            flowmapSetting = new FlowmapSetting(flowData, mono, renderSetting);
-        }
-
-        private void InitFlowData()
-        {
-            if (flowData == null)
-            {
-                flowData = mono.gameObject.GetComponent<FlowMapData>();
-                if (flowData == null)
-                {
-                    flowData = mono.gameObject.AddComponent<FlowMapData>();
-                }
-            }
-
-            areaPos = flowData.areaPos;
-            areaSize = flowData.areaSize;
-            texSize = (FlowMapSizeEnum)flowData.texSize;
-            flowSpeed = flowData.flowSpeed;
-            brushStrength = flowData.brushStrength;
-        }
 
         public override void OnInspectorGUI()
         {
@@ -74,55 +56,28 @@ namespace Water.Editor
             SceneView.duringSceneGui -= OnSceneGUIEvent;
         }
 
-        void OnSceneGUIEvent(SceneView sceneView)
-        {
-            if (!isDraw)
-            {
-                return;
-            }
-
-            DrawWaterEvent();
-        }
-
-
 
         void DrawGUI()
         {
-            var lastScene = SceneView.lastActiveSceneView;
-            if (lastScene != null)
-            {
-                lastScene.sceneViewState.alwaysRefresh = true;
-                lastScene.sceneViewState.showSkybox = true;
-                lastScene.sceneViewState.showImageEffects = true;
-            }
+            FlowMapUtils.SetSceneView();
 
             isDraw = GUILayout.Toggle(isDraw, "FlowMap Painter", "Button");
             if (!isDraw)
             {
+                isGetPath = false;
                 return;
             }
-            
-            mono.areaPos = mono.transform.position;
 
-            var areaSizeOld = FlowMapViewUtils.IntSliderGUI("Flow Area Size", areaSize, 10, 2000);
-            if (areaSize != areaSizeOld)
+            if (!isGetPath)
             {
-                areaSize = areaSizeOld;
-                mono.areaSize = areaSize;
+                flowMapPath = FlowMapUtils.GetCurrentSceneFolder(EditorSceneManager.GetActiveScene().path);
+                isGetPath = true;
             }
-            
-            var boundsSize = flowData.bounds.size;
-            float maxValue = 0;
-            if (boundsSize.x > boundsSize.z)
-            {
-                maxValue = boundsSize.x;
-            }
-            else
-            {
-                maxValue = boundsSize.z;
-            }
-            mono.areaSize = (int)maxValue;
-            
+
+
+            mono.areaPos = mono.transform.position;
+            mono.areaSize = FlowMapUtils.SetDrawFlowMapArea(flowData);
+
             var texSizeOld = (FlowMapSizeEnum)FlowMapViewUtils.EnumPopupGUI("Flow Map resolution", texSize);
             if (texSize != texSizeOld)
             {
@@ -148,7 +103,7 @@ namespace Water.Editor
             {
                 if (GUILayout.Button("Reset"))
                 {
-                    InitFlowData();
+                    LoadFlowData();
                 }
 
                 if (GUILayout.Button("Save"))
@@ -158,22 +113,31 @@ namespace Water.Editor
                         return;
                     }
 
-                    flowmapSetting.Save();
+                    FlowMapUtils.Save(flowData, mono, flowMapPath, (int)mono.texSize);
                 }
 
                 if (GUILayout.Button("Clear"))
                 {
                     flowData.flowTex = null;
-                    InitFlowData();
+                    LoadFlowData();
                 }
             }
             EditorGUILayout.EndHorizontal();
         }
 
-
-        void DrawWaterEvent()
+        private void OnSceneGUIEvent(SceneView sceneView)
         {
+            if (!isDraw || !_isActive)
+                return;
+
             flowmapSetting.DrawFlowMapEditor(mono, this);
+        }
+
+        private void LoadFlowData()
+        {
+            texSize = (FlowMapSizeEnum)flowData.texSize;
+            flowSpeed = flowData.flowSpeed;
+            brushStrength = flowData.brushStrength;
         }
     }
 }
