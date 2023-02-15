@@ -18,7 +18,7 @@ namespace Water.Editor
         private FlowMapSizeEnum texSize = FlowMapSizeEnum._1024;
         private float flowSpeed = 0.5f;
         private float brushStrength = 1;
-
+        private FlowMapRenderSetting renderSetting;
 
         void OnEnable()
         {
@@ -29,8 +29,10 @@ namespace Water.Editor
 
         private void Init()
         {
+            renderSetting = new FlowMapRenderSetting();
+
             InitFlowData();
-            flowmapSetting = new FlowmapSetting(flowData);
+            flowmapSetting = new FlowmapSetting(flowData, mono, renderSetting);
         }
 
         private void InitFlowData()
@@ -74,8 +76,15 @@ namespace Water.Editor
 
         void OnSceneGUIEvent(SceneView sceneView)
         {
+            if (!isDraw)
+            {
+                return;
+            }
+
             DrawWaterEvent();
         }
+
+
 
         void DrawGUI()
         {
@@ -87,18 +96,13 @@ namespace Water.Editor
                 lastScene.sceneViewState.showImageEffects = true;
             }
 
-            // isDraw = EditorGUILayout.Toggle("FlowMap Painter", isDraw, "Button");
-            // if (!isDraw)
-            // {
-            //     return;
-            // }
-
-            var areaPosOld = FlowMapViewUtils.Vector3GUI("FlowMap Area Position", areaPos);
-            if (areaPosOld != areaPos)
+            isDraw = GUILayout.Toggle(isDraw, "FlowMap Painter", "Button");
+            if (!isDraw)
             {
-                areaPos = areaPosOld;
-                mono.areaPos = areaPos;
+                return;
             }
+            
+            mono.areaPos = mono.transform.position;
 
             var areaSizeOld = FlowMapViewUtils.IntSliderGUI("Flow Area Size", areaSize, 10, 2000);
             if (areaSize != areaSizeOld)
@@ -106,7 +110,19 @@ namespace Water.Editor
                 areaSize = areaSizeOld;
                 mono.areaSize = areaSize;
             }
-
+            
+            var boundsSize = flowData.bounds.size;
+            float maxValue = 0;
+            if (boundsSize.x > boundsSize.z)
+            {
+                maxValue = boundsSize.x;
+            }
+            else
+            {
+                maxValue = boundsSize.z;
+            }
+            mono.areaSize = (int)maxValue;
+            
             var texSizeOld = (FlowMapSizeEnum)FlowMapViewUtils.EnumPopupGUI("Flow Map resolution", texSize);
             if (texSize != texSizeOld)
             {

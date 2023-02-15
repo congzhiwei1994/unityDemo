@@ -1,12 +1,6 @@
 ﻿using System;
-using System.IO;
-using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.Profiling;
 using UnityEngine.Rendering;
-using UnityEngine.Serialization;
-
 
 namespace Water
 {
@@ -21,10 +15,9 @@ namespace Water
     [DisallowMultipleComponent]
     [ExecuteAlways]
     [Serializable]
-    public partial class FlowMapMono : MonoBehaviour
+    public class FlowMapMono : MonoBehaviour
     {
         private Transform waterTran;
-        private KW_FlowMap _flowMapRenderSetting;
 
         public FlowMapSizeEnum texSize = FlowMapSizeEnum._2048;
         public int areaSize = 200;
@@ -52,12 +45,7 @@ namespace Water
         private void Init()
         {
             waterMaterial = waterTran.gameObject.GetComponent<Renderer>().sharedMaterial;
-            _flowMapRenderSetting = waterTran.gameObject.GetComponent<KW_FlowMap>();
-            if (_flowMapRenderSetting == null)
-            {
-                _flowMapRenderSetting = waterTran.gameObject.AddComponent<KW_FlowMap>();
-            }
-        
+
             flowMapData = waterTran.gameObject.GetComponent<FlowMapData>();
             if (flowMapData == null)
             {
@@ -67,9 +55,9 @@ namespace Water
 
         private void BeforeCameraRendering(Camera cam)
         {
-            Profiler.BeginSample("Water.Rendering");
-            RenderWater();
-            Profiler.EndSample();
+            waterMaterial.SetFloat(FlowMapSize, areaSize);
+            waterMaterial.SetVector(FlowMapOffset, areaPos);
+            waterTran.gameObject.GetComponent<Renderer>().sharedMaterial = waterMaterial;
         }
 
         private void AfterCameraRendering(Camera cam)
@@ -87,42 +75,6 @@ namespace Water
         }
 
 
-        private void RenderWater()
-        {
-            // ReadFlowMap();
-            UpdateShaderParameters();
-        }
-
-
-        private void UpdateShaderParameters()
-        {
-            waterMaterial.SetFloat(FlowMapSize, areaSize);
-            waterMaterial.SetVector(FlowMapOffset, areaPos);
-            SetWaterMat();
-        }
-
-        private void SetWaterMat()
-        {
-            waterTran.gameObject.GetComponent<Renderer>().sharedMaterial = waterMaterial;
-        }
-
-
-        public void DrawOnFlowMap(Vector3 brushPosition, Vector3 brushMoveDirection, float circleRadius,
-            float brushStrength, bool eraseMode = false)
-        {
-            InitializeFlowMapEditorResources();
-            _flowMapRenderSetting.DrawOnFlowMap(brushPosition, brushMoveDirection, circleRadius, brushStrength, eraseMode);
-        }
-
-        void InitializeFlowMapEditorResources()
-        {
-            _flowMapRenderSetting.InitializeFlowMapEditorResources((int)texSize, 500);
-        }
-
-
-        
-
-
         #region 事件
 
         private void OnBeginCameraRenderingManager(ScriptableRenderContext ctx, Camera cam)
@@ -134,6 +86,7 @@ namespace Water
         {
             AfterCameraRendering(cam);
         }
+
 
         #endregion
     }

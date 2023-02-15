@@ -2,8 +2,8 @@ Shader "Unlit/FlowMap"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
-        _MainColor("主颜色",Color) = (1,1,1,1)
+//        _MainTex ("Texture", 2D) = "white" {}
+//        _MainColor("主颜色",Color) = (1,1,1,1)
         //        _FlowMap("FlowMap",2D) = "white"{}
         _FlowSpeed("向量场强度",Range(0,1)) = 0.1
         _TimeSpeed("全局流速",float) = 1
@@ -18,8 +18,8 @@ Shader "Unlit/FlowMap"
         }
         Cull Off
         Lighting Off
-        ZWrite On
-        Blend SrcAlpha OneMinusSrcAlpha
+//        ZWrite On
+//        Blend SrcAlpha OneMinusSrcAlpha
         HLSLINCLUDE
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
