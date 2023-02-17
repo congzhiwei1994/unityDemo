@@ -7,6 +7,17 @@ namespace Water
 {
     public class FlowMapUtils
     {
+        public static FlowMapMono GetFlowMapMono(GameObject gameObject)
+        {
+            var mono = gameObject.GetComponent<FlowMapMono>();
+            if (mono == null)
+            {
+                mono = gameObject.AddComponent<FlowMapMono>();
+            }
+
+            return mono;
+        }
+
         public static void SetSceneView()
         {
             var lastScene = SceneView.lastActiveSceneView;
@@ -163,6 +174,17 @@ namespace Water
             if (flowData == null)
             {
                 flowData = mono.gameObject.AddComponent<FlowMapData>();
+            }
+
+            return flowData;
+        }
+        
+        public static FlowMapData GetFlowMapData(GameObject gameObject)
+        {
+            var flowData =gameObject.GetComponent<FlowMapData>();
+            if (flowData == null)
+            {
+                flowData = gameObject.AddComponent<FlowMapData>();
             }
 
             return flowData;
