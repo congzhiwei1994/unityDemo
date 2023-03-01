@@ -17,6 +17,9 @@ namespace Water.Editor
         private FlowMapData flowData;
         private float brushStrength;
         private float flowSpeed;
+        private bool isDrawFlow;
+        private FlowSetting flowSetting;
+        private FlowRenderSetting renderSetting;
 
         #endregion
 
@@ -32,14 +35,22 @@ namespace Water.Editor
 
         private void OnEnable()
         {
+            flowSetting = new FlowSetting();
+            renderSetting = new FlowRenderSetting();
+
             SceneView.duringSceneGui += OnSceneGUIEvent;
         }
 
-        private void Reset()
+        private void JudgeIsDrawFlow()
         {
-            texSize = (FlowMapSizeEnum)flowData.texSize;
-            flowSpeed = flowData.flowSpeed;
-            brushStrength = flowData.brushStrength;
+            if (waterGameObject == null || mono == null || flowData == null)
+            {
+                isDrawFlow = false;
+            }
+            else
+            {
+                isDrawFlow = true;
+            }
         }
 
         private void OnGUI()
@@ -54,6 +65,8 @@ namespace Water.Editor
 
                 Reset();
             }
+
+            JudgeIsDrawFlow();
 
             var texSizeOld = (FlowMapSizeEnum)FlowMapViewUtils.EnumPopupGUI("Flow Map Size", texSize);
             if (texSize != texSizeOld)
@@ -80,27 +93,32 @@ namespace Water.Editor
             {
                 if (GUILayout.Button("Reset"))
                 {
-                    // LoadFlowData();
+                    Reset();
                 }
 
                 if (GUILayout.Button("Save"))
                 {
-                    // if (flowData.flowTex == null)
-                    // {
-                    //     return;
-                    // }
-                    //
-                    // FlowMapUtils.Save(flowData, mono, flowMapPath, (int)mono.texSize);
-                }
-
-                if (GUILayout.Button("Clear"))
-                {
-                    // flowData.flowTex = null;
-                    // LoadFlowData();
+                    Save();
                 }
             }
         }
 
+        private void Reset()
+        {
+            if (flowData != null)
+            {
+                texSize = (FlowMapSizeEnum)flowData.texSize;
+                flowSpeed = flowData.flowSpeed;
+                brushStrength = flowData.brushStrength;
+            }
+        }
+
+        private void Save()
+        {
+            flowData.brushStrength = mono.brushStrength;
+            flowData.flowTex = mono.flowTex;
+            flowData.texSize = (int)mono.texSize;
+        }
 
         private void OnDisable()
         {
@@ -115,6 +133,11 @@ namespace Water.Editor
 
         private void OnSceneGUIEvent(SceneView sceneView)
         {
+            if (isDrawFlow && !Application.isPlaying)
+            {
+                flowSetting.Init(mono, flowData);
+                flowSetting.DrawFlowMapEditor(this, Event.current);
+            }
         }
     }
 }

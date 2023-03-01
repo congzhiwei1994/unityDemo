@@ -72,7 +72,6 @@ namespace czw.SSSS
             // }
 
             ConfigureClear(ClearFlag.All, Color.black);
-            //将这个RT设置为Render Target
             ConfigureTarget(handle_Diffuse.id, handle_Depth.id);
         }
 

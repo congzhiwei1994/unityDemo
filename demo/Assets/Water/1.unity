@@ -258,7 +258,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &564149149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -295,6 +295,7 @@ MonoBehaviour:
   texSize: 2048
   areaSize: 319
   areaPos: {x: -72, y: 0, z: -125}
+  flowTex: {fileID: 0}
   flowSpeed: 1
   brushStrength: 1
 --- !u!64 &564149152
@@ -527,13 +528,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   flowTex: {fileID: 0}
-  texSize: 1024
+  texSize: 2048
   areaSize: 200
   flowSpeed: 0
-  brushStrength: 0
+  brushStrength: 1
   areaPos: {x: 0, y: 0, z: 0}
   bounds:
-    m_Center: {x: -72, y: 5, z: -125}
+    m_Center: {x: -72, y: 5, z: -125.380005}
     m_Extent: {x: 5, y: 5, z: 5}
 --- !u!64 &1123573006
 MeshCollider:
@@ -569,7 +570,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 7a5388fb89fffe94a8e4d67db5d3330e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -607,7 +608,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1123573004}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -72, y: 0, z: -125}
+  m_LocalPosition: {x: -72, y: 0, z: -125.38}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

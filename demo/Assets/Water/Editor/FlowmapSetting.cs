@@ -15,13 +15,18 @@ namespace Water.Editor
         private FlowMapMono mono;
         private FlowMapRenderSetting renderSetting;
 
+        
+        public FlowmapSetting()
+        {
+
+        }
+        
         public FlowmapSetting(FlowMapData flowData, FlowMapMono mono, FlowMapRenderSetting renderSetting)
         {
             this.flowData = flowData;
             this.mono = mono;
             this.renderSetting = renderSetting;
         }
-
 
         public void DrawFlowMapEditor(FlowMapMono flowMapMono, UnityEditor.Editor editor)
         {

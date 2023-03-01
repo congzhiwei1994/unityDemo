@@ -11,6 +11,19 @@ namespace Water
         string _name;
         public bool isInitialized;
 
+        private TextureDimension dimension = TextureDimension.Tex2D;
+        private GraphicsFormat format = GraphicsFormat.R16G16B16A16_SFloat;
+        private VRTextureUsage vrUsage = VRTextureUsage.None;
+        private FilterMode filterMode = FilterMode.Bilinear;
+        private ShadowSamplingMode shadowSamplingMode = ShadowSamplingMode.None;
+        private int mipMapCount = 0;
+        private int msaaSamples = 1;
+        private bool autoGenerateMips = false;
+        private bool useMipMap = false;
+        private bool useRandomWrite = false;
+        private Color clearColor = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+        private ClearFlag clearFlag = ClearFlag.Color;
+
         public TemporaryRenderTexture()
         {
         }
@@ -25,17 +38,11 @@ namespace Water
             isInitialized = true;
         }
 
-        public void Alloc(string name, int width, int height, int depth, GraphicsFormat format)
+        public void Alloc(string name, int width, int height, int depth)
         {
             if (rt == null)
             {
-#if UNITY_2019_2_OR_NEWER
                 descriptor = new RenderTextureDescriptor(width, height, format, depth);
-#else
-                    descriptor =
- new RenderTextureDescriptor(width, height, GraphicsFormatUtility.GetRenderTextureFormat(format), depth);
-#endif
-
                 descriptor.sRGB = false;
                 descriptor.useMipMap = false;
                 descriptor.autoGenerateMips = false;
@@ -62,100 +69,35 @@ namespace Water
             }
         }
 
-        public void Alloc(string name, int width, int height, int depth, GraphicsFormat format, bool useMipMap,
-            bool useRandomWrite = false, TextureDimension dimension = TextureDimension.Tex2D,
-            bool autoGenerateMips = false, int mipMapCount = 0, int msaaSamples = 1,
-            VRTextureUsage vrUsage = VRTextureUsage.None,
-            FilterMode filterMode = FilterMode.Bilinear,
-            ShadowSamplingMode shadowSamplingMode = ShadowSamplingMode.None)
+
+        public void Alloc(string name, int width, int height, int depth, ClearFlag clearFlag)
         {
             if (rt == null)
             {
-#if UNITY_2019_2_OR_NEWER
                 descriptor = new RenderTextureDescriptor(width, height, format, depth);
-#else
-                    descriptor =
- new RenderTextureDescriptor(width, height, GraphicsFormatUtility.GetRenderTextureFormat(format), depth);
-#endif
-
                 descriptor.sRGB = false;
                 descriptor.enableRandomWrite = useRandomWrite;
                 descriptor.dimension = dimension;
                 descriptor.useMipMap = useMipMap;
                 descriptor.autoGenerateMips = autoGenerateMips;
                 descriptor.shadowSamplingMode = shadowSamplingMode;
-#if UNITY_2019_2_OR_NEWER
                 descriptor.mipCount = mipMapCount;
-#endif
                 descriptor.msaaSamples = msaaSamples;
                 descriptor.vrUsage = vrUsage;
 
                 rt = RenderTexture.GetTemporary(descriptor);
                 rt.name = name;
                 _name = name;
-                if (!rt.IsCreated()) rt.Create();
-                isInitialized = true;
-            }
-            else if (rt.width != width || rt.height != height || rt.dimension != dimension ||
-                     rt.useMipMap != useMipMap || !isInitialized || _name != name)
-            {
-                if (isInitialized) Release();
-
-                descriptor.width = width;
-                descriptor.height = height;
-                descriptor.dimension = dimension;
-                descriptor.useMipMap = useMipMap;
-
-                rt = RenderTexture.GetTemporary(descriptor);
-                rt.name = name;
-                _name = name;
-                if (!rt.IsCreated()) rt.Create();
-                isInitialized = true;
-            }
-        }
-
-        public void Alloc(string name, int width, int height, int depth, GraphicsFormat format, ClearFlag clearFlag,
-            Color clearColor,
-            bool useRandomWrite = false, TextureDimension dimension = TextureDimension.Tex2D, bool useMipMap = false,
-            bool autoGenerateMips = false, int mipMapCount = 0, int msaaSamples = 1,
-            VRTextureUsage vrUsage = VRTextureUsage.None,
-            FilterMode filterMode = FilterMode.Bilinear,
-            ShadowSamplingMode shadowSamplingMode = ShadowSamplingMode.None)
-        {
-            if (rt == null)
-            {
-#if UNITY_2019_2_OR_NEWER
-                descriptor = new RenderTextureDescriptor(width, height, format, depth);
-#else
-                    descriptor =
- new RenderTextureDescriptor(width, height, GraphicsFormatUtility.GetRenderTextureFormat(format), depth);
-#endif
-
-                descriptor.sRGB = false;
-                descriptor.enableRandomWrite = useRandomWrite;
-                descriptor.dimension = dimension;
-                descriptor.useMipMap = useMipMap;
-                descriptor.autoGenerateMips = autoGenerateMips;
-                descriptor.shadowSamplingMode = shadowSamplingMode;
-#if UNITY_2019_2_OR_NEWER
-                descriptor.mipCount = mipMapCount;
-#endif
-                descriptor.msaaSamples = msaaSamples;
-                descriptor.vrUsage = vrUsage;
-
-                rt = RenderTexture.GetTemporary(descriptor);
-                rt.name = name;
-                _name = name;
-                if (!rt.IsCreated()) 
+                if (!rt.IsCreated())
                     rt.Create();
-                
-                ClearRenderTexture(rt, clearFlag, clearColor);
+
+                ClearRenderTexture(rt, clearFlag);
                 isInitialized = true;
             }
             else if (rt.width != width || rt.height != height || rt.dimension != dimension ||
                      rt.useMipMap != useMipMap || !isInitialized || _name != name)
             {
-                if (isInitialized) 
+                if (isInitialized)
                     Release();
 
                 descriptor.width = width;
@@ -166,14 +108,14 @@ namespace Water
                 rt = RenderTexture.GetTemporary(descriptor);
                 rt.name = name;
                 _name = name;
-                if (!rt.IsCreated()) 
+                if (!rt.IsCreated())
                     rt.Create();
-                ClearRenderTexture(rt, clearFlag, clearColor);
+                ClearRenderTexture(rt, clearFlag);
                 isInitialized = true;
             }
         }
-        
-        public  void ClearRenderTexture(RenderTexture rt, ClearFlag clearFlag, Color clearColor)
+
+        public void ClearRenderTexture(RenderTexture rt, ClearFlag clearFlag)
         {
             var activeRT = RenderTexture.active;
             RenderTexture.active = rt;
@@ -187,7 +129,7 @@ namespace Water
             {
                 RenderTexture.ReleaseTemporary(rt);
                 isInitialized = false;
-                if (unlink) 
+                if (unlink)
                     rt = null;
             }
         }

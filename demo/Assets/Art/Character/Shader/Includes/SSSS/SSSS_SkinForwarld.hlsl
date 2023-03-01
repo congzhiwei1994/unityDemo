@@ -93,7 +93,7 @@ half4 LitPassFragment_Specular(Varyings input) : SV_Target
     half roughnessMap = SAMPLE_TEXTURE2D(_RoughnessMap, sampler_RoughnessMap, input.uv);
     half occlusion = SAMPLE_TEXTURE2D(_OcclusionMap, sampler_OcclusionMap, input.uv);
     occlusion = lerp(1, occlusion, _Occlusion);
-    
+
     half4 bumpMap = SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, input.uv);
     half3 normalTS = UnpackNormalScale(bumpMap, _BumpScale);
 
@@ -114,7 +114,7 @@ half4 LitPassFragment_Specular(Varyings input) : SV_Target
     half3 viewDirWS = SafeNormalize(input.viewDirWS);
     half roughness0 = roughnessMap * _Roughness0;
     half roughness1 = roughnessMap * _Roughness1;
-    
+
     //采样SSSBlurRT
     float2 screenUV = input.positionCS.xy / _ScreenParams.xy;
     float4 SkinSSSMap = SAMPLE_TEXTURE2D(_SSSBlurRT, sampler_SSSBlurRT, screenUV);
@@ -125,10 +125,9 @@ half4 LitPassFragment_Specular(Varyings input) : SV_Target
     half3 specualrColor = specularMap * _Specular * 0.08;
 
     half3 specular = SkinSSSS_DirectSpecular(normalWS, viewDirWS, mainLight, roughnessFactor, specualrColor);
-half3 indirectSpecular = IndirectSpecualr(normalWS, viewDirWS, roughnessFactor, specualrColor);
+    half3 indirectSpecular = IndirectSpecualr(normalWS, viewDirWS, roughnessFactor, specualrColor);
     half3 color = diffuse * SkinSSSMap + specular + indirectSpecular;
-
-
+    
     return half4(color, 1);
 }
 

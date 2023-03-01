@@ -17,11 +17,10 @@ namespace Water
     [Serializable]
     public class FlowMapMono : MonoBehaviour
     {
-
         public FlowMapSizeEnum texSize = FlowMapSizeEnum._2048;
         public int areaSize = 200;
         public Vector3 areaPos = new Vector3(0, 0, 0);
-        
+        public Texture flowTex;
         public float flowSpeed = 1;
         public float brushStrength = 1;
 

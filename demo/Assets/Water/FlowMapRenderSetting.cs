@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 namespace Water
 {
     [DisallowMultipleComponent]
-    public class FlowMapRenderSetting : MonoBehaviour
+    public class FlowMapRenderSetting 
     {
 
         public TemporaryRenderTexture _flowmapRT = new TemporaryRenderTexture();
@@ -41,14 +41,13 @@ namespace Water
             if (_flowmapRT.isInitialized && _flowmapRT.rt.width != texSize)
             {
                 var tempRT = new TemporaryRenderTexture();
-                tempRT.Alloc("_flowmapRT", texSize, texSize, 0, GraphicsFormat.R16G16B16A16_SFloat);
+                tempRT.Alloc("_flowmapRT", texSize, texSize, 0);
                 Graphics.Blit(_flowmapRT.rt, tempRT.rt);
                 _flowmapRT.Release(true);
                 _flowmapRT = tempRT;
             }
             else
-                _flowmapRT.Alloc("_flowmapRT", texSize, texSize, 0, GraphicsFormat.R16G16B16A16_SFloat, ClearFlag.Color,
-                    new Color(0.5f, 0.5f, 0.5f, 0.5f));
+                _flowmapRT.Alloc("_flowmapRT", texSize, texSize, 0,  ClearFlag.Color);
 
 
             if (_flowMapTex2D != null)

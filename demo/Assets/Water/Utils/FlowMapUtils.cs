@@ -178,10 +178,10 @@ namespace Water
 
             return flowData;
         }
-        
+
         public static FlowMapData GetFlowMapData(GameObject gameObject)
         {
-            var flowData =gameObject.GetComponent<FlowMapData>();
+            var flowData = gameObject.GetComponent<FlowMapData>();
             if (flowData == null)
             {
                 flowData = gameObject.AddComponent<FlowMapData>();
